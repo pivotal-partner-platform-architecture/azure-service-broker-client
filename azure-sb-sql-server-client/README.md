@@ -1,10 +1,10 @@
 # To run locally using H2 in memory database
 ```
-java -jar azure-sb-sql-server-client/target/azure-sb-client-0.0.1-SNAPSHOT.jar
+java -jar azure-sb-sql-server-client/target/azure-sb-sql-server-client-0.0.1-SNAPSHOT.jar
 ```
 
 # To create the SQL Server service instance on PCF
-Before you can create the service, you'll need to create a SQL Server instance on Azure, then
+Before you can create the service, you'll need to [create a SQL Server instance on Azure](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-get-started), then
 create a JSON file with the configuration details for your service instance.
 For this example, I used "app-db" as the APP-DATABASE-NAME.  All other values are for the resources
 used when creating the SQL Server database in Azure.
