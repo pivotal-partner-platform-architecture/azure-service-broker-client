@@ -1,23 +1,6 @@
-# azure-service-broker-client
-Demo application for client applications consuming azure services exposed through the PCF Azure Service Broker
-
-# Description
-This demo is composed of the following applications:
-
-# azure-sb-client
-This application is a simple SQL Server database client
-
-# Build the projects
-To build all the projects, just open a shell in the root of the project, and run
+# To run locally using H2 in memory database
 ```
-cd azure-sb-client
-./mvnw clean package
-```
-
-# To run locally
-```
-cd azure-sb-client
-./mvnw spring-boot:run
+java -jar azure-sb-sql-server-client/target/azure-sb-client-0.0.1-SNAPSHOT.jar
 ```
 
 # To create the SQL Server service instance on PCF
@@ -99,14 +82,14 @@ GO
 
 
 # To push to PCF
-Login to your PCF environment and run "cf push" from the azure-sb-client folder.
+Login to your PCF environment and run "cf push" from the azure-sb-sql-server-client folder.
 
 ```
 ---
 applications:
-- name: azure-sb-client
+- name: azure-sb-sql-server-client
   memory: 1G
-  path: ./target/azure-sb-client-0.0.1-SNAPSHOT.jar
+  path: ./target/azure-sb-sql-server-client-0.0.1-SNAPSHOT.jar
   random-route: true
   services:
     - mydb
