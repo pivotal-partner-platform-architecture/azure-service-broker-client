@@ -10,7 +10,6 @@ This application is a simple SQL Server database client
 # Build the projects
 To build all the projects, just open a shell in the root of the project, and run
 ```
-cd azure-sb-client
 mvn clean package
 ```
 

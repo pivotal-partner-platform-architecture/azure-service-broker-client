@@ -78,11 +78,9 @@ GO
 
 ```
 
-
-
-
 # To push to PCF
-Login to your PCF environment and run "cf push" from the azure-sb-sql-server-client folder.
+Login to your PCF environment and run "cf push" from the azure-sb-sql-server-client folder.  When running on PCF, Spring Boot will automatically create the
+SQL Server datasource for you based on the "mydb" service bound to the application (only Spring Boot 1.5 or greater).
 
 ```
 ---
