@@ -1,5 +1,5 @@
 # To create the Storage service instance on PCF
-Before you can create the service, you'll need to create a storage resource group on Azure, then
+Before you can create the service, you'll need to create a resource group on Azure, then
 create a JSON file (ex. azure-storage.json) with the configuration details for your service instance.
 Specify your newly created resource group name for STORAGE_RESOURCE_GROUP_NAME, a new
 value for STORAGE_ACCOUNT_NAME, and your location for LOCATION
