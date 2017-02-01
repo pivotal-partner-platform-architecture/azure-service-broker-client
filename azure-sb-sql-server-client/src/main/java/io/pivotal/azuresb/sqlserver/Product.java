@@ -1,4 +1,4 @@
-package io.pivotal.azuresb;
+package io.pivotal.azuresb.sqlserver;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

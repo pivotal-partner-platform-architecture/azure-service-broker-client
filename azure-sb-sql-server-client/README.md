@@ -5,7 +5,7 @@ java -jar azure-sb-sql-server-client/target/azure-sb-sql-server-client-0.0.1-SNA
 
 # To create the SQL Server service instance on PCF
 Before you can create the service, you'll need to [create a SQL Server instance on Azure](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-get-started), then
-create a JSON file with the configuration details for your service instance.
+create a JSON file (ex. azure-sqldb.json) with the configuration details for your service instance.
 For this example, I used "app-db" as the APP-DATABASE-NAME.  All other values are for the resources
 used when creating the SQL Server database in Azure.
 
@@ -95,3 +95,10 @@ applications:
   services:
     - mydb
 ```
+
+# Try the SQL Demo
+Get the URL from the output of the "cf-push" command, and append "/sql" to run the sql demo, which uses the product repository class to insert and retrieve data with SQL Server on Azure.
+The datasource is created created automatically by Spring Boot after it detects the bound service.
+
+
+

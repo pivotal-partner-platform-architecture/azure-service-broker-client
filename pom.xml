@@ -7,12 +7,13 @@
 	<artifactId>azure-sb-demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Spring Boot AutoConfiguration</name>
+	<name>Azure Service Broker Demo</name>
 
 	<modules>
 		<module>azure-sb-spring-boot-autoconfigure</module>
 		<module>azure-sb-spring-boot-starter</module>
 		<module>azure-sb-sql-server-client</module>
+		<module>azure-sb-storage-client</module>
 	</modules>
 
 </project>

@@ -1,4 +1,4 @@
-package io.pivotal.azuresb;
+package io.pivotal.azuresb.sqlserver;
 
 import java.util.List;
 
