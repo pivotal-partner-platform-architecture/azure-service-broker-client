@@ -37,10 +37,22 @@ applications:
     - mystorage
 ```
 
-# Try the Blob Demo
-Get the URL from the output of the "cf-push" command, and append "/blob" to run the blob demo, which retrieves an image from a website
+# Try the Storage Demo
+There are several storage types available for Azure.  Get the URL from the output of the "cf-push" command, and append
+the following endpoints:
+
+* "/blob" - this demo retrieves an image from a website
 and stores it in a new storage container on Azure (under the storage account name you specified above), and displays it.  It pulls the
-credentials from the VCAP_SERVICES environment variable that PCF populates when you bind the service to the app.
+Azure credentials from the VCAP_SERVICES environment variable that PCF populates when you bind the service to the app.
+
+* "/table" - this demo uses the Table NoSQL storage feature to create a new table and populate it with a java object identified by
+a partition and row key.
+
+* "/queue" - this demo uses the Queue service to create a queue, put a message on the queue, then retrieve and delete it.
+
+
+
+
 
 
 
