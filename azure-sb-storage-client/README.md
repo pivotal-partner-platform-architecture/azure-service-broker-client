@@ -50,6 +50,8 @@ a partition and row key.
 
 * "/queue" - this demo uses the Queue service to create a queue, put a message on the queue, then retrieve and delete it.
 
+* "/file" - this demo uses the File service to create a share, directory, and file, upload contents to the file, and then download the contents.
+
 
 
 
