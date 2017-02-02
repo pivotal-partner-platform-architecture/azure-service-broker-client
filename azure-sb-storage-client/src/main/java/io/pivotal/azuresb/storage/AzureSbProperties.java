@@ -73,4 +73,15 @@ public class AzureSbProperties {
 	public void setStorageAccountKey(String storageAccountKey) {
 		this.storageAccountKey = storageAccountKey;
 	}
+	
+	public String buildStorageConnectString()
+	{
+		LOG.debug("storage account name = " + getStorageAccountName());
+		LOG.debug("storage account key = " + getStorageAccountKey());
+		String storageConnectionString = "DefaultEndpointsProtocol=http;"
+				+ "AccountName=" + getStorageAccountName() + ";" 
+				+ "AccountKey=" + getStorageAccountKey();
+	    return storageConnectionString;
+	}
+
 }

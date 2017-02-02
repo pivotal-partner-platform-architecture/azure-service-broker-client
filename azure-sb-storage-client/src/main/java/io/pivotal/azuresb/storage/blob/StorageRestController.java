@@ -1,4 +1,6 @@
-package io.pivotal.azuresb.storage;
+package io.pivotal.azuresb.storage.blob;
+
+import io.pivotal.azuresb.storage.AzureSbProperties;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -42,7 +44,7 @@ public class StorageRestController {
 		    int imageSize = IOUtils.copy(is, response.getOutputStream());
 		    
 		    LOG.debug("Connecting to storage account...");
-			CloudStorageAccount account = CloudStorageAccount.parse(buildConnectString());
+			CloudStorageAccount account = CloudStorageAccount.parse(properties.buildStorageConnectString());
 			CloudBlobClient serviceClient = account.createCloudBlobClient();
 
 			// Container name must be lower case.
@@ -60,13 +62,4 @@ public class StorageRestController {
 		}
 	}
 	
-	private String buildConnectString()
-	{
-		LOG.debug("storage account name = " + properties.getStorageAccountName());
-		LOG.debug("storage account key = " + properties.getStorageAccountKey());
-		String storageConnectionString = "DefaultEndpointsProtocol=http;"
-				+ "AccountName=" + properties.getStorageAccountName() + ";" 
-				+ "AccountKey=" + properties.getStorageAccountKey();
-	    return storageConnectionString;
-	}
 }
