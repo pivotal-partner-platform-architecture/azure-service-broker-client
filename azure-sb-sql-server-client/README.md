@@ -98,7 +98,7 @@ applications:
 
 # Try the SQL Demo
 Get the URL from the output of the "cf-push" command, and append "/sql" to run the sql demo, which uses the product repository class to insert and retrieve data with SQL Server on Azure.
-The datasource is created created automatically by Spring Boot after it detects the bound service.
+The datasource is created automatically by Spring Boot after it detects the bound service.
 
 
 

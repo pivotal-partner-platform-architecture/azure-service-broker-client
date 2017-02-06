@@ -14,6 +14,7 @@
 		<module>azure-sb-spring-boot-starter</module>
 		<module>azure-sb-sql-server-client</module>
 		<module>azure-sb-storage-client</module>
+		<module>azure-sb-service-bus-client</module>
 	</modules>
 
 </project>
