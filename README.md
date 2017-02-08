@@ -29,6 +29,9 @@ mvn clean package
 
 [Service Bus client] (azure-sb-service-bus-client/README.md)
 
+[Redis client] (azure-sb-redis-client/README.md)
+
+
 
 
 

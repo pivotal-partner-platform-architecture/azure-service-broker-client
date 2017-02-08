@@ -15,6 +15,7 @@
 		<module>azure-sb-sql-server-client</module>
 		<module>azure-sb-storage-client</module>
 		<module>azure-sb-service-bus-client</module>
+		<module>azure-sb-redis-client</module>
 	</modules>
 
 </project>
