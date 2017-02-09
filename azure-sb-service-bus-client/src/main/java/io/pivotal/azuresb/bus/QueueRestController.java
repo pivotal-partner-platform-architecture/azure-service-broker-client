@@ -1,5 +1,6 @@
 package io.pivotal.azuresb.bus;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -134,6 +135,8 @@ public class QueueRestController
 		{
 			LOG.error("Error processing request ", e);
 		}
+
+		result.append("Processed Date = " + new Date(System.currentTimeMillis()) + CR);
 
 		LOG.info("QueueRestController process end");
 		return result.toString();

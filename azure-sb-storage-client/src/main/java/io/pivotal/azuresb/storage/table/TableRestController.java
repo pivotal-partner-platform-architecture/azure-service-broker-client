@@ -1,5 +1,7 @@
 package io.pivotal.azuresb.storage.table;
 
+import java.util.Date;
+
 import io.pivotal.azuresb.storage.AzureSbProperties;
 
 import javax.servlet.http.HttpServletResponse;
@@ -67,6 +69,8 @@ public class TableRestController {
 		} catch (Exception e) {
 			LOG.error("Error processing request ", e);
 		}
+
+		result.append("Processed Date = " + new Date(System.currentTimeMillis()) + CR);
 
 		LOG.info("TableRestController processTable end");
 		return result.toString();

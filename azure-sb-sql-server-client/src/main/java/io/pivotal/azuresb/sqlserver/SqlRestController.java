@@ -1,5 +1,7 @@
 package io.pivotal.azuresb.sqlserver;
 
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,8 @@ public class SqlRestController {
 			result.append(p.toString() + CR);
 		}
 		result.append("" + CR);
+		result.append("Processed Date = " + new Date(System.currentTimeMillis()) + CR);
+
 		LOG.info("SqlRestController processSql end");
 		return result.toString();
 	}

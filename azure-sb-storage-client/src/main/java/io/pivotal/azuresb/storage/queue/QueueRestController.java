@@ -1,5 +1,7 @@
 package io.pivotal.azuresb.storage.queue;
 
+import java.util.Date;
+
 import io.pivotal.azuresb.storage.AzureSbProperties;
 
 import javax.servlet.http.HttpServletResponse;
@@ -59,6 +61,8 @@ public class QueueRestController {
 		} catch (Exception e) {
 			LOG.error("Error processing request ", e);
 		}
+
+		result.append("Processed Date = " + new Date(System.currentTimeMillis()) + CR);
 
 		LOG.info("QueueRestController process end");
 		return result.toString();

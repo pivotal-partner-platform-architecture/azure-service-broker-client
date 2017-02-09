@@ -4,6 +4,7 @@ import io.pivotal.azuresb.storage.AzureSbProperties;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -81,6 +82,8 @@ public class FileRestController
 		} catch (Exception e) {
 			LOG.error("Error processing request ", e);
 		}
+
+		result.append("Processed Date = " + new Date(System.currentTimeMillis()) + CR);
 
 		LOG.info("FileRestController process end");
 		return result.toString();
