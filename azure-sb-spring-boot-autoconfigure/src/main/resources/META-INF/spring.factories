@@ -1,1 +1,5 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=io.pivotal.azuresb.autoconfigure.AzureServiceBrokerAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.pivotal.azuresb.autoconfigure.AzureServiceBrokerAutoConfiguration,\
+io.pivotal.azuresb.autoconfigure.AzureRedisProperties
+
+

@@ -1,4 +1,4 @@
-package io.pivotal.azuresb.redis;
+package io.pivotal.azuresb.autoconfigure;
 
 import javax.annotation.PostConstruct;
 
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 
-@ConfigurationProperties("azureredis")
+@ConfigurationProperties()
 public class AzureRedisProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureRedisProperties.class);

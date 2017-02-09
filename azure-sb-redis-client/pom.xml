@@ -29,7 +29,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jersey</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -40,13 +40,22 @@
 			<artifactId>azure-sb-spring-boot-starter</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-		
-		<!-- This is required to be in the project POM, even though it is also present in the spring boot starter -->
+
+		<!-- This is required to be in the project POM, even though it is also 
+			present in the spring boot starter -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
+
+
 
 	</dependencies>
 

@@ -1,5 +1,7 @@
 package io.pivotal.azuresb.redis;
 
+import io.pivotal.azuresb.autoconfigure.AzureRedisProperties;
+
 import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
