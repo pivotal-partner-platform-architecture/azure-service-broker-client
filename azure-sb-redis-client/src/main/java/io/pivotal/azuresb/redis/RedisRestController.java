@@ -1,5 +1,7 @@
 package io.pivotal.azuresb.redis;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -39,6 +41,7 @@ public class RedisRestController
 
 		String value = valueOps.get();
 		result.append("Getting product value = " + value + CR);
+		result.append("Processed Date = " + new Date(System.currentTimeMillis()) + CR);
 
 		LOG.info("RedisRestController process end");
 		return result.toString();
