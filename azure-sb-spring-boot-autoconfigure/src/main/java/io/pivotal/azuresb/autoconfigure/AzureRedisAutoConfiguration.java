@@ -3,12 +3,14 @@ package io.pivotal.azuresb.autoconfigure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 
 @Configuration
+@ConditionalOnMissingBean(RedisConnectionFactory.class)
 public class AzureRedisAutoConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureRedisAutoConfiguration.class);

@@ -48,25 +48,39 @@ public class AzureSbServiceBusProperties
 			try
 			{
 				JSONObject json = new JSONObject(vcapServices);
-				JSONArray azureStorage = json.getJSONArray(AZURE_SERVICEBUS);
-				if (azureStorage != null)
+				JSONArray azureServiceBus = null;
+				
+				try
 				{
-					int numElements = azureStorage.length();
+					azureServiceBus = json.getJSONArray(AZURE_SERVICEBUS);
+				}
+				catch (JSONException e)
+				{
+					LOG.debug("vcapServices does not contain " + AZURE_SERVICEBUS);
+				}
+				
+				if (azureServiceBus != null)
+				{
+					int numElements = azureServiceBus.length();
 					LOG.debug("numElements = " + numElements);
 					for (int i = 0; i < numElements; i++)
 					{
-						JSONObject storage = azureStorage.getJSONObject(i);
-						JSONObject creds = storage.getJSONObject(CREDENTIALS);
+						JSONObject serviceBus = azureServiceBus.getJSONObject(i);
+						JSONObject creds = null;
+						try
+						{
+							creds = serviceBus.getJSONObject(CREDENTIALS);
+						}
+						catch (JSONException e)
+						{
+							LOG.error("Found " + AZURE_SERVICEBUS + ", but missing " + CREDENTIALS + " : " + VCAP_SERVICES);
+						}
+						
 						if (creds != null)
 						{
 							namespaceName = creds.getString(NAMESPACE_NAME);
 							sharedAccessName = creds.getString(SHARED_ACCESS_NAME);
 							sharedAccessKeyValue = creds.getString(SHARED_ACCESS_KEY_VALUE);
-						}
-						else
-						{
-							LOG.error("Found " + AZURE_SERVICEBUS + ", but missing " + CREDENTIALS + " : " + VCAP_SERVICES);
-							
 						}
 					}
 				}
