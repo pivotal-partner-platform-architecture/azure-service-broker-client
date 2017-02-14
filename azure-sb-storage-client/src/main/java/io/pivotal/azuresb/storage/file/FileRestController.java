@@ -1,7 +1,5 @@
 package io.pivotal.azuresb.storage.file;
 
-import io.pivotal.azuresb.storage.AzureSbProperties;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Date;
@@ -11,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +20,6 @@ import com.microsoft.azure.storage.file.CloudFileDirectory;
 import com.microsoft.azure.storage.file.CloudFileShare;
 
 @RestController
-@EnableConfigurationProperties(AzureSbProperties.class)
 public class FileRestController 
 {
 	private static final Logger LOG = LoggerFactory
@@ -31,7 +27,7 @@ public class FileRestController
 	private static final String CR = "</BR>";
 
 	@Autowired
-	private AzureSbProperties properties;
+	private CloudStorageAccount account;
 
 	@RequestMapping(value = "/file", method = RequestMethod.GET)
 	public String process(HttpServletResponse response) {
@@ -40,9 +36,6 @@ public class FileRestController
 
 		try {
 			result.append("Connecting to storage account..." + CR);
-			CloudStorageAccount account = CloudStorageAccount.parse(properties
-					.buildStorageConnectString());
-
 			result.append("Creating file client..." + CR);
 			CloudFileClient fileClient = account.createCloudFileClient();
 			

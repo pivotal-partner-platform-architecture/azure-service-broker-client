@@ -38,7 +38,7 @@ public class QueueRestController
 	{
 		StringBuffer result = new StringBuffer();
 
-		LOG.info("QueueRestController process start...");
+		LOG.info("process start...");
 
 		result.append("Connecting to service bus..." + CR);
 		boolean queueExists = false;

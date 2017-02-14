@@ -1,7 +1,5 @@
 package io.pivotal.azuresb.redis;
 
-import io.pivotal.azuresb.autoconfigure.AzureRedisProperties;
-
 import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
@@ -9,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,15 +14,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@EnableConfigurationProperties(AzureRedisProperties.class)
 public class RedisRestController
 {
 	private static final Logger LOG = LoggerFactory.getLogger(RedisRestController.class);
 	private static final String CR = "</BR>";
 
-	@Autowired
-	private AzureRedisProperties properties;
-	
 	@Autowired
 	private StringRedisTemplate template;
 

@@ -3,4 +3,6 @@ io.pivotal.azuresb.autoconfigure.AzureServiceBrokerAutoConfiguration,\
 io.pivotal.azuresb.autoconfigure.AzureRedisProperties,\
 io.pivotal.azuresb.autoconfigure.AzureRedisAutoConfiguration,\
 io.pivotal.azuresb.autoconfigure.AzureSbServiceBusProperties,\
-io.pivotal.azuresb.autoconfigure.AzureServiceBusAutoConfiguration
+io.pivotal.azuresb.autoconfigure.AzureServiceBusAutoConfiguration,\
+io.pivotal.azuresb.autoconfigure.AzureStorageAutoConfiguration,\
+io.pivotal.azuresb.autoconfigure.AzureStorageProperties

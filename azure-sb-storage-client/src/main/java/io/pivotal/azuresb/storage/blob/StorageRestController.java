@@ -1,7 +1,5 @@
 package io.pivotal.azuresb.storage.blob;
 
-import io.pivotal.azuresb.storage.AzureSbProperties;
-
 import java.io.InputStream;
 import java.net.URL;
 
@@ -11,7 +9,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,7 +21,6 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
 
 @RestController
-@EnableConfigurationProperties(AzureSbProperties.class)
 public class StorageRestController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StorageRestController.class);
@@ -32,7 +28,7 @@ public class StorageRestController {
 	public static final String IMAGE_PATH = "https://raw.githubusercontent.com/mjeffries-pivotal/pcf-samples/master/images/azure-pcf.jpg";
 	
 	@Autowired
-	private AzureSbProperties properties;
+	private CloudStorageAccount account;
 
 	@RequestMapping(value = "/blob", method = RequestMethod.GET)
 	public @ResponseBody void showBlob(HttpServletResponse response) {
@@ -44,7 +40,6 @@ public class StorageRestController {
 		    int imageSize = IOUtils.copy(is, response.getOutputStream());
 		    
 		    LOG.debug("Connecting to storage account...");
-			CloudStorageAccount account = CloudStorageAccount.parse(properties.buildStorageConnectString());
 			CloudBlobClient serviceClient = account.createCloudBlobClient();
 
 			// Container name must be lower case.
