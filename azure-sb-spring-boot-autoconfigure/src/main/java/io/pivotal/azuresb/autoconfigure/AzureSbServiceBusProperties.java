@@ -2,7 +2,6 @@ package io.pivotal.azuresb.autoconfigure;
 
 import javax.annotation.PostConstruct;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -13,13 +12,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 
 @ConfigurationProperties()
-public class AzureSbServiceBusProperties
+public class AzureSbServiceBusProperties extends AzureProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureSbServiceBusProperties.class);
 
-	private static final String VCAP_SERVICES = "VCAP_SERVICES";
 	private static final String AZURE_SERVICEBUS = "azure-servicebus";
-	private static final String CREDENTIALS = "credentials";
 	private static final String SHARED_ACCESS_NAME = "shared_access_key_name";
 	private static final String SHARED_ACCESS_KEY_VALUE = "shared_access_key_value";
 	private static final String NAMESPACE_NAME = "namespace_name";
@@ -38,56 +35,22 @@ public class AzureSbServiceBusProperties
 	private String sharedAccessKeyValue;
 
 	@PostConstruct
-	private void populate()
+	private void populateProperties()
 	{
-		LOG.info("AzureSbServiceBusProperties populate started...");
-		String vcapServices = environment.getProperty(VCAP_SERVICES);
-		if (vcapServices != null)
+		super.populate(AZURE_SERVICEBUS);
+	}
+
+	@Override
+	protected void populateCallback(JSONObject creds)
+	{
+		try
 		{
-			LOG.debug("vcapServices = " + vcapServices);
-			try
-			{
-				JSONObject json = new JSONObject(vcapServices);
-				JSONArray azureServiceBus = null;
-				
-				try
-				{
-					azureServiceBus = json.getJSONArray(AZURE_SERVICEBUS);
-				}
-				catch (JSONException e)
-				{
-					LOG.debug("vcapServices does not contain " + AZURE_SERVICEBUS);
-				}
-				
-				if (azureServiceBus != null)
-				{
-					int numElements = azureServiceBus.length();
-					LOG.debug("numElements = " + numElements);
-					for (int i = 0; i < numElements; i++)
-					{
-						JSONObject serviceBus = azureServiceBus.getJSONObject(i);
-						JSONObject creds = null;
-						try
-						{
-							creds = serviceBus.getJSONObject(CREDENTIALS);
-						}
-						catch (JSONException e)
-						{
-							LOG.error("Found " + AZURE_SERVICEBUS + ", but missing " + CREDENTIALS + " : " + VCAP_SERVICES);
-						}
-						
-						if (creds != null)
-						{
-							namespaceName = creds.getString(NAMESPACE_NAME);
-							sharedAccessName = creds.getString(SHARED_ACCESS_NAME);
-							sharedAccessKeyValue = creds.getString(SHARED_ACCESS_KEY_VALUE);
-						}
-					}
-				}
-			} catch (JSONException e)
-			{
-				LOG.error("Error parsing " + VCAP_SERVICES, e);
-			}
+			namespaceName = creds.getString(NAMESPACE_NAME);
+			sharedAccessName = creds.getString(SHARED_ACCESS_NAME);
+			sharedAccessKeyValue = creds.getString(SHARED_ACCESS_KEY_VALUE);
+		} catch (JSONException e)
+		{
+			LOG.error("Error parsing credentials for " + VCAP_SERVICES, e);
 		}
 	}
 
