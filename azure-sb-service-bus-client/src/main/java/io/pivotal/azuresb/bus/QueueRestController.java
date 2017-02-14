@@ -1,7 +1,5 @@
 package io.pivotal.azuresb.bus;
 
-import io.pivotal.azuresb.autoconfigure.AzureSbServiceBusProperties;
-
 import java.util.Date;
 import java.util.List;
 
@@ -11,16 +9,12 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.microsoft.windowsazure.Configuration;
 import com.microsoft.windowsazure.exception.ServiceException;
-import com.microsoft.windowsazure.services.servicebus.ServiceBusConfiguration;
 import com.microsoft.windowsazure.services.servicebus.ServiceBusContract;
-import com.microsoft.windowsazure.services.servicebus.ServiceBusService;
 import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
 import com.microsoft.windowsazure.services.servicebus.models.CreateQueueResult;
 import com.microsoft.windowsazure.services.servicebus.models.ListQueuesResult;
@@ -30,7 +24,6 @@ import com.microsoft.windowsazure.services.servicebus.models.ReceiveMode;
 import com.microsoft.windowsazure.services.servicebus.models.ReceiveQueueMessageResult;
 
 @RestController
-@EnableConfigurationProperties(AzureSbServiceBusProperties.class)
 public class QueueRestController
 {
 	private static final Logger LOG = LoggerFactory.getLogger(QueueRestController.class);
@@ -38,7 +31,7 @@ public class QueueRestController
 	private static final String QUEUE_NAME = "PRODUCT_QUEUE";
 
 	@Autowired
-	private AzureSbServiceBusProperties properties;
+	private ServiceBusContract service;
 
 	@RequestMapping(value = "/queue", method = RequestMethod.GET)
 	public String process(HttpServletResponse response)
@@ -48,14 +41,6 @@ public class QueueRestController
 		LOG.info("QueueRestController process start...");
 
 		result.append("Connecting to service bus..." + CR);
-		String profile = null;
-		Configuration config = new Configuration();
-		String connectionString = properties.buildServiceBusConnectString();
-		ServiceBusConfiguration.configureWithConnectionString(profile, config, connectionString);
-
-		result.append("Checking for queue " + QUEUE_NAME + CR);
-		ServiceBusContract service = ServiceBusService.create(config);
-		
 		boolean queueExists = false;
 		ListQueuesResult queueList;
 		try
