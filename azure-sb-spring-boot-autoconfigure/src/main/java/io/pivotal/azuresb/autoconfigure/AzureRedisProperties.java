@@ -47,16 +47,40 @@ public class AzureRedisProperties
 			try
 			{
 				JSONObject json = new JSONObject(vcapServices);
-				JSONArray azureStorage = json.getJSONArray(AZURE_REDISCACHE);
-				int numElements = azureStorage.length();
-				LOG.debug("numElements = " + numElements);
-				for (int i = 0; i < numElements; i++)
+				JSONArray azureStorage = null;
+				
+				try
 				{
-					JSONObject storage = azureStorage.getJSONObject(i);
-					JSONObject creds = storage.getJSONObject(CREDENTIALS);
-					hostname = creds.getString(HOST_NAME);
-					sslPort = creds.getString(SSL_PORT);
-					primaryKey = creds.getString(PRIMARY_KEY);
+					azureStorage = json.getJSONArray(AZURE_REDISCACHE);
+				}
+				catch (JSONException e)
+				{
+					LOG.debug("vcapServices does not contain " + AZURE_REDISCACHE);
+				}
+				
+				if (azureStorage != null)
+				{
+					int numElements = azureStorage.length();
+					LOG.debug("numElements = " + numElements);
+					for (int i = 0; i < numElements; i++)
+					{
+						JSONObject storage = azureStorage.getJSONObject(i);
+						JSONObject creds = null;
+						try
+						{
+							creds = storage.getJSONObject(CREDENTIALS);
+						}
+						catch (JSONException e)
+						{
+							LOG.error("Found " + AZURE_REDISCACHE + ", but missing " + CREDENTIALS + " : " + VCAP_SERVICES);
+						}
+						if (creds != null)
+						{
+							hostname = creds.getString(HOST_NAME);
+							sslPort = creds.getString(SSL_PORT);
+							primaryKey = creds.getString(PRIMARY_KEY);
+						}
+					}
 				}
 			} catch (JSONException e)
 			{

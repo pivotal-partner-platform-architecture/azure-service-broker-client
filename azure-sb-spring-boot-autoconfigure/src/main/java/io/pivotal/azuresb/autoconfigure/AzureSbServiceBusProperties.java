@@ -1,4 +1,4 @@
-package io.pivotal.azuresb.bus;
+package io.pivotal.azuresb.autoconfigure;
 
 import javax.annotation.PostConstruct;
 
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 
-@ConfigurationProperties("azureservicebus")
+@ConfigurationProperties()
 public class AzureSbServiceBusProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureSbServiceBusProperties.class);
@@ -49,15 +49,26 @@ public class AzureSbServiceBusProperties
 			{
 				JSONObject json = new JSONObject(vcapServices);
 				JSONArray azureStorage = json.getJSONArray(AZURE_SERVICEBUS);
-				int numElements = azureStorage.length();
-				LOG.debug("numElements = " + numElements);
-				for (int i = 0; i < numElements; i++)
+				if (azureStorage != null)
 				{
-					JSONObject storage = azureStorage.getJSONObject(i);
-					JSONObject creds = storage.getJSONObject(CREDENTIALS);
-					namespaceName = creds.getString(NAMESPACE_NAME);
-					sharedAccessName = creds.getString(SHARED_ACCESS_NAME);
-					sharedAccessKeyValue = creds.getString(SHARED_ACCESS_KEY_VALUE);
+					int numElements = azureStorage.length();
+					LOG.debug("numElements = " + numElements);
+					for (int i = 0; i < numElements; i++)
+					{
+						JSONObject storage = azureStorage.getJSONObject(i);
+						JSONObject creds = storage.getJSONObject(CREDENTIALS);
+						if (creds != null)
+						{
+							namespaceName = creds.getString(NAMESPACE_NAME);
+							sharedAccessName = creds.getString(SHARED_ACCESS_NAME);
+							sharedAccessKeyValue = creds.getString(SHARED_ACCESS_KEY_VALUE);
+						}
+						else
+						{
+							LOG.error("Found " + AZURE_SERVICEBUS + ", but missing " + CREDENTIALS + " : " + VCAP_SERVICES);
+							
+						}
+					}
 				}
 			} catch (JSONException e)
 			{

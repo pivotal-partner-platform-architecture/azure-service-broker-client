@@ -1,5 +1,7 @@
 package io.pivotal.azuresb.bus;
 
+import io.pivotal.azuresb.autoconfigure.AzureSbServiceBusProperties;
+
 import java.util.Date;
 import java.util.List;
 
