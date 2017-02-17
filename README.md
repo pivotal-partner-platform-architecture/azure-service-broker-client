@@ -10,6 +10,9 @@ This application is a simple SQL Server database client
 # azure-sb-storage-client
 This application is a storage client using the Blob, Table, Queue, Disk, and File storage capabilities
 
+# azure-sb-documentdb-client
+This application is a simple DocumentDB client
+
 # azure-sb-spring-boot-autoconfigure
 Spring Boot starter project includes libraries and components
 
