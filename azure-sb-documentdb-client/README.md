@@ -1,54 +1,24 @@
-# To create the Service Bus service instance on PCF
-Before you can create the service, you'll need to create a resource group on Azure, then
-create a JSON file (ex. azure-servicebus.json) with the configuration details for your service instance.
-Specify the resource group name for SERVICE_BUS_RESOURCE_GROUP_NAME, a new
-value for NAMESPACE_NAME, and your Azure location for LOCATION
+# To create the DocumentDB service instance on PCF
+Refer the documentation here: https://docs.pivotal.io/partners/azure-sb/using.html
 
-```
-{
-  "resource_group_name": "SERVICE_BUS_RESOURCE_GROUP_NAME",
-  "namespace_name": "NAMESPACE_NAME",
-  "location": "LOCATION",
-  "type": "Messaging",
-  "messaging_tier": "Standard"
-}
+Once the Service Instance is created....
 
-```
-
-Now you can create the new service
-
-```
-cf create-service azure-servicebus standard myservicebus -c ./azure-servicebus.json
-```
+# Buld your project
+edit the application.properties under src/main/resources of your Client project and add the following properties
+* azure.documentdb.service.instance=[CF SERVICE INSTANCE NAME]
+* azure.documentdb.resource.id=[NAME OF THE DOCUMENTDB COLLECTION]
 
 # To push to PCF
-Login to your PCF environment and run "cf push" from the azure-sb-service-bus-client folder.
+Login to your PCF environment
+Go to your azure-sb-service-bus-client folder.
+Edit the manifest.yml file appropriately. Make sure your service instance name is correct
+Run "cf push"
 
-The manifest.yml file specifies meta-data about the application, including the service binding to the "myservicebus" service instance.
-
-
-```
----
-applications:
-- name: azure-service-bus-client
-  memory: 1G
-  path: ./target/azure-sb-service-bus-client-0.0.1-SNAPSHOT.jar
-  random-route: true
-  services:
-    - myservicebus
-
-```
-
-# Try the Service Bus Demo
+# Try the DocumentDB Demo
 Get the URL from the output of the "cf-push" command, and append
 the following endpoints:
 
-* "/queue" - this demo uses the Queue service to create a queue, put a message on the queue, then retrieve and delete it.
-
-
-
-
-
-
-
-
+* "/read" - this will display all the documents in your Collection
+* "/write?name=[NAME]&category=[CATEGORY]" - this will create a document in your Collection with the given name and category
+* "update?id=[DOCUMENT ID]&isComplete=[TRUE/FALSE]" - this will update the Category of the Document with given ID
+* "/delete?id=[DOCUMENT ID]" - this will delete the document with the given ID
