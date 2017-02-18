@@ -16,6 +16,7 @@
 		<module>azure-sb-storage-client</module>
 		<module>azure-sb-service-bus-client</module>
 		<module>azure-sb-redis-client</module>
+		<module>azure-sb-documentdb-client</module>
 	</modules>
 
 </project>

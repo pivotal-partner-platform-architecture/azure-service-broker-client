@@ -1,0 +1,9 @@
+---
+applications:
+- name: azure-documentdb-client
+  memory: 1G
+  path: ./target/azure-sb-documentdb-client-0.0.1-SNAPSHOT.jar
+  random-route: true
+  services:
+    - ppbdocdb
+
