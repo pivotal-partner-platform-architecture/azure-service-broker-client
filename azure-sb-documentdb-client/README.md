@@ -1,3 +1,15 @@
+# About azure-sb-documentdb-client
+This is a simple Spring Boot application that reads and writes into an Azure DocumentDB database.
+The app exposes 4 REST endpoints - _read, write, update and delete_
+This app actually is the sample java application described in this link below but refactored to fit into the Spring Boot Starter model.
+https://docs.microsoft.com/en-us/azure/documentdb/documentdb-java-application
+
+# How this works?
+When you create a Service Instance of DocumentDB in Cloud Foundry, the Azure Service Broker creates a DocumentDB database in your Account. 
+You bind this service instance with your App. 
+Inside the DocumentDB, you can create multiple Collections, and inside each Collection you can create multiple Documents.
+The App provides CRUD REST endpoints to create documents into the Collection you specified. If the Collection does not exist in the DocumentDB database, it will create it. 
+
 # To create the DocumentDB service instance on PCF
 Refer the documentation here: https://docs.pivotal.io/partners/azure-sb/using.html
 
