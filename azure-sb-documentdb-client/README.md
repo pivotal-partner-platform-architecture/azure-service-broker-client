@@ -2,7 +2,7 @@
 This is a simple Spring Boot application that reads and writes into an Azure DocumentDB database.
 The app exposes 4 REST endpoints - _read, write, update and delete_
 This app actually is the sample java application described in this link below but refactored to fit into the Spring Boot Starter model.
-https://docs.microsoft.com/en-us/azure/documentdb/documentdb-java-application
+https://github.com/Azure/azure-documentdb-java
 
 # How this works?
 When you create a Service Instance of DocumentDB in Cloud Foundry, the Azure Service Broker creates a DocumentDB database in your Account. 
