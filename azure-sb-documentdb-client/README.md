@@ -15,18 +15,27 @@ Refer the documentation here: https://docs.pivotal.io/partners/azure-sb/using.ht
 
 Once the Service Instance is created....
 
-# Build your project
-edit the _application.properties_ under _src/main/resources_ of your Client project and add the following properties
-* _azure.documentdb.service.instance=[CF SERVICE INSTANCE NAME]_
-* _azure.documentdb.resource.id=[NAME OF THE DOCUMENTDB COLLECTION]_
-
-# To push to PCF
-Login to your PCF environment
-Go to your azure-sb-service-bus-client folder.
-Edit the _manifest.yml_ file appropriately. Make sure your service instance name is correct
-Run _"cf push"_
 
 # Try the DocumentDB Demo
+
+1. Checkout the repository from GIT
+git clone https://github.com/pivotal-alliances-immersion/azure-service-broker-client.git
+
+2.  Edit the appropriate config files
+edit the under _azure-service-broker-client/azure-sb-documentdb-client/src/main/resources/application.properties_ and edit the following properties
+* _azure.documentdb.service.instance=[CF SERVICE INSTANCE NAME]_  (this will be the DocumentDB service instance name from the step above)
+* _azure.documentdb.resource.id=[NAME OF THE DOCUMENTDB COLLECTION]_  (give some name to your Document Collection. The _write_ REST call will create this Collection if it does not exist)
+
+3. Edit the CF Manifest
+edit the under _azure-service-broker-client/azure-sb-documentdb-client/manifest.yml_ (make sure the service instance name is correct)
+
+4. Build your project
+Run _mvn clean package_ from _azure-service-broker-client/_ folder
+
+5. Push the App to PCF
+run _cf push_ from _azure-service-broker-client/azure-sb-documentdb-client_ folder
+
+6. Run the App
 Get the URL from the output of the _"cf push"_ command, and append
 the following endpoints:
 
