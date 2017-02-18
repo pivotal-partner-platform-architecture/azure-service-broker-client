@@ -3,7 +3,7 @@ Refer the documentation here: https://docs.pivotal.io/partners/azure-sb/using.ht
 
 Once the Service Instance is created....
 
-# Buld your project
+# Build your project
 edit the _application.properties_ under _src/main/resources_ of your Client project and add the following properties
 * _azure.documentdb.service.instance=[CF SERVICE INSTANCE NAME]_
 * _azure.documentdb.resource.id=[NAME OF THE DOCUMENTDB COLLECTION]_
