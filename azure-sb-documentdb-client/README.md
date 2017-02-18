@@ -19,7 +19,7 @@ Once the Service Instance is created....
 # Try the DocumentDB Demo
 
 ## 1. Checkout the repository from GIT
-git clone https://github.com/pivotal-alliances-immersion/azure-service-broker-client.git
+_git clone https://github.com/pivotal-alliances-immersion/azure-service-broker-client.git_
 
 ##  2. Edit the appropriate config files
 edit the under _azure-service-broker-client/azure-sb-documentdb-client/src/main/resources/application.properties_ and edit the following properties
