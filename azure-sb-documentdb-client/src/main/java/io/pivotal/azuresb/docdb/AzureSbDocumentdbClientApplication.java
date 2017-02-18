@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @EnableAutoConfiguration
 @SpringBootApplication
-// @ComponentScan("io.pivotal")
 public class AzureSbDocumentdbClientApplication {
 
 	public static void main(String[] args) {
@@ -40,14 +39,11 @@ public class AzureSbDocumentdbClientApplication {
 	@RequestMapping("/read")
 	List<TodoItem> readTodoItems() {
 		List<TodoItem> todoItems = null;
-		System.out.println("\nBEGIN\n");
 		try {
 			todoItems = todoDao.readTodoItems();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("\n*** Dao Invoked \n");
-		System.out.println("\nRESULTS:\n" + todoItems);
 		return todoItems;
 	}
 
@@ -59,42 +55,33 @@ public class AzureSbDocumentdbClientApplication {
 		todoItem.setComplete(false);
 		todoItem.setCategory(category);
 		todoItem.setName(name);
-		System.out.println("\nBEGIN\n");
 		try {
 			todoItemCreated = todoDao.createTodoItem(todoItem);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("\n*** Dao Invoked \n");
-		System.out.println("\nRESULTS:\n" + todoItemCreated);
 		return todoItemCreated;
 	}
 
 	@RequestMapping("/update")
 	TodoItem updateTodoItem(String id, boolean isComplete) {
 		TodoItem todoItemUpdated = null;
-		System.out.println("\nBEGIN\n");
 		try {
 			todoItemUpdated = todoDao.updateTodoItem(id, isComplete);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("\n*** Dao Invoked \n");
-		System.out.println("\nRESULTS:\n" + todoItemUpdated);
 		return todoItemUpdated;
 	}
 
 	@RequestMapping("/delete")
 	boolean deleteTodoItem(String id) {
 		boolean deleted = false;
-		System.out.println("\nBEGIN\n");
 		try {
 			deleted = todoDao.deleteTodoItem(id);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("\n*** Dao Invoked \n");
-		System.out.println("\nRESULTS:\n" + deleted);
 		return deleted;
 	}
 
