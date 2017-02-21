@@ -34,7 +34,4 @@ mvn clean package
 
 [Redis client] (azure-sb-redis-client/README.md)
 
-
-
-
-
+[DocumentDB client] (azure-sb-documentdb-client/README.md)
