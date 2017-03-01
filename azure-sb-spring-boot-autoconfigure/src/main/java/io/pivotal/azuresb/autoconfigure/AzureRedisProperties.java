@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties()
+@ConfigurationProperties("azure.redis")
 public class AzureRedisProperties extends AzureProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureRedisProperties.class);

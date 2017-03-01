@@ -3,10 +3,8 @@ package io.pivotal.azuresb.autoconfigure;
 import javax.annotation.PostConstruct;
 
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.env.Environment;
 
 /**
  * 
@@ -16,31 +14,27 @@ import org.springframework.core.env.Environment;
  *         Instance and the DocumentDB Resource ID is defined in the
  *         azure-sb-documentdb-client project's application.properties
  */
-@ConfigurationProperties()
+@ConfigurationProperties("azure.documentdb")
 public class AzureDocumentDBProperties extends AzureProperties {
-
-	@Autowired
-	private Environment environment;
 
 	/**
 	 * Adding default values for the below attributes just so the Tests pass
 	 * when running Maven builds
 	 */
-
 	@Value("${azure.documentdb.resource.id:myresource}")
-	private String documentdbResourceId;
+	private String resourceId;
 
 	@Value("${vcap.services.${azure.documentdb.service.instance:myservice}.credentials.documentdb_host_endpoint:myhost}")
-	private String documentdbHostEndpoint;
+	private String hostEndpoint;
 
 	@Value("${vcap.services.${azure.documentdb.service.instance:myservice}.credentials.documentdb_master_key:mymasterkey}")
-	private String documentdbMasterKey;
+	private String masterKey;
 
 	@Value("${vcap.services.${azure.documentdb.service.instance:myservice}.credentials.documentdb_database_id:mydatabaseid}")
-	private String documentdbDatabaseId;
+	private String databaseId;
 
 	@Value("${vcap.services.${azure.documentdb.service.instance:myservice}.credentials.documentdb_database_link:mydatabaselink}")
-	private String documentdbLink;
+	private String link;
 
 	@Override
 	protected void populateCallback(JSONObject credentials) {
@@ -55,44 +49,44 @@ public class AzureDocumentDBProperties extends AzureProperties {
 				.println("INSIDE AzureDocumentDBProperties.populateProperties");
 	}
 
-	public String getDocumentdbResourceId() {
-		return documentdbResourceId;
+	public String getResourceId() {
+		return resourceId;
 	}
 
-	public void setDocumentdbResourceId(String documentdbResourceId) {
-		this.documentdbResourceId = documentdbResourceId;
+	public void setResourceId(String resourceId) {
+		this.resourceId = resourceId;
 	}
 
-	public String getDocumentdbHostEndpoint() {
-		return documentdbHostEndpoint;
+	public String getHostEndpoint() {
+		return hostEndpoint;
 	}
 
-	public void setDocumentdbHostEndpoint(String documentdbHostEndpoint) {
-		this.documentdbHostEndpoint = documentdbHostEndpoint;
+	public void setHostEndpoint(String hostEndpoint) {
+		this.hostEndpoint = hostEndpoint;
 	}
 
-	public String getDocumentdbMasterKey() {
-		return documentdbMasterKey;
+	public String getMasterKey() {
+		return masterKey;
 	}
 
-	public void setDocumentdbMasterKey(String documentdbMasterKey) {
-		this.documentdbMasterKey = documentdbMasterKey;
+	public void setMasterKey(String masterKey) {
+		this.masterKey = masterKey;
 	}
 
-	public String getDocumentdbDatabaseId() {
-		return documentdbDatabaseId;
+	public String getDatabaseId() {
+		return databaseId;
 	}
 
-	public void setDocumentdbDatabaseId(String documentdbDatabaseId) {
-		this.documentdbDatabaseId = documentdbDatabaseId;
+	public void setDatabaseId(String databaseId) {
+		this.databaseId = databaseId;
 	}
 
-	public String getDocumentdbLink() {
-		return documentdbLink;
+	public String getLink() {
+		return link;
 	}
 
-	public void setDocumentdbLink(String documentdbLink) {
-		this.documentdbLink = documentdbLink;
+	public void setLink(String link) {
+		this.link = link;
 	}
 
 }
