@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,8 +29,11 @@ public class QueueRestController
 	private static final String CR = "</BR>";
 	private static final String QUEUE_NAME = "PRODUCT_QUEUE";
 
-	@Autowired
-	private ServiceBusContract service;
+	private final ServiceBusContract service;
+
+	public QueueRestController(ServiceBusContract service) {
+		this.service = service;
+	}
 
 	@RequestMapping(value = "/queue", method = RequestMethod.GET)
 	public String process(HttpServletResponse response)

@@ -6,9 +6,7 @@ import io.pivotal.azuresb.docdb.model.TodoItem;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,12 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
  *         REST CRUD methods for the DocumentDB
  */
 @RestController
-@EnableAutoConfiguration
 public class DocumentDbRestController {
 
-	@Autowired
-	@Qualifier("DocDbDaoInstance")
-	private TodoDao todoDao;
+	private final TodoDao todoDao;
+
+	public DocumentDbRestController(@Qualifier("DocDbDaoInstance") TodoDao todoDao) {
+		this.todoDao = todoDao;
+	}
 
 	@RequestMapping("/greeting")
 	private List<String> greet(String name) {
