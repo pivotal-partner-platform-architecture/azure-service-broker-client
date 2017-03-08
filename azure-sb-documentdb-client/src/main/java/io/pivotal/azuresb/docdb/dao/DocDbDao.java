@@ -6,8 +6,6 @@ import io.pivotal.azuresb.docdb.model.TodoItem;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
@@ -17,18 +15,14 @@ import com.microsoft.azure.documentdb.DocumentClient;
 import com.microsoft.azure.documentdb.DocumentClientException;
 import com.microsoft.azure.documentdb.DocumentCollection;
 
-@Configuration
 @Component("DocDbDaoInstance")
 public class DocDbDao implements TodoDao {
 
 	// Use Gson for POJO <=> JSON serialization
 	private static Gson gson = new Gson();
 
-	@Autowired
-	private AzureDocumentDBProperties properties;
-
-	@Autowired
-	private DocumentClient documentClient;
+	private final AzureDocumentDBProperties properties;
+	private final DocumentClient documentClient;
 
 	// Cache for the database object, so we don't have to query for it to
 	// retrieve self links.
@@ -37,6 +31,11 @@ public class DocDbDao implements TodoDao {
 	// Cache for the collection object, so we don't have to query for it to
 	// retrieve self links.
 	private static DocumentCollection collectionCache;
+
+	public DocDbDao(AzureDocumentDBProperties properties, DocumentClient documentClient) {
+		this.properties = properties;
+		this.documentClient = documentClient;
+	}
 
 	@Override
 	public TodoItem createTodoItem(TodoItem todoItem) {
@@ -138,7 +137,7 @@ public class DocDbDao implements TodoDao {
 			List<Database> databaseList = documentClient
 					.queryDatabases(
 							"SELECT * FROM root r WHERE r.id='"
-									+ properties.getDocumentdbDatabaseId()
+									+ properties.getDatabaseId()
 									+ "'", null).getQueryIterable().toList();
 
 			if (databaseList.size() > 0) {
@@ -150,7 +149,7 @@ public class DocDbDao implements TodoDao {
 				try {
 					Database databaseDefinition = new Database();
 					databaseDefinition.setId(properties
-							.getDocumentdbDatabaseId());
+							.getDatabaseId());
 
 					databaseCache = documentClient.createDatabase(
 							databaseDefinition, null).getResource();
@@ -175,7 +174,7 @@ public class DocDbDao implements TodoDao {
 					.queryCollections(
 							getTodoDatabase().getSelfLink(),
 							"SELECT * FROM root r WHERE r.id='"
-									+ properties.getDocumentdbResourceId()
+									+ properties.getResourceId()
 									+ "'", null).getQueryIterable().toList();
 
 			if (collectionList.size() > 0) {
@@ -187,7 +186,7 @@ public class DocDbDao implements TodoDao {
 				try {
 					DocumentCollection collectionDefinition = new DocumentCollection();
 					collectionDefinition.setId(properties
-							.getDocumentdbResourceId());
+							.getResourceId());
 
 					collectionCache = documentClient.createCollection(
 							getTodoDatabase().getSelfLink(),

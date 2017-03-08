@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +18,11 @@ public class RedisRestController
 	private static final Logger LOG = LoggerFactory.getLogger(RedisRestController.class);
 	private static final String CR = "</BR>";
 
-	@Autowired
-	private StringRedisTemplate template;
+	private final StringRedisTemplate template;
+
+	public RedisRestController(StringRedisTemplate template) {
+		this.template = template;
+	}
 
 	@RequestMapping(value = "/redis", method = RequestMethod.GET)
 	public String process(HttpServletResponse response)

@@ -6,12 +6,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.env.Environment;
 
-@ConfigurationProperties()
+@ConfigurationProperties("azure.servicebus")
 public class AzureSbServiceBusProperties extends AzureProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureSbServiceBusProperties.class);
@@ -21,9 +19,6 @@ public class AzureSbServiceBusProperties extends AzureProperties
 	private static final String SHARED_ACCESS_KEY_VALUE = "shared_access_key_value";
 	private static final String NAMESPACE_NAME = "namespace_name";
 	private static final String AZURE_SERVICE_BUS_DOMAIN = "servicebus.windows.net";
-
-	@Autowired
-	private Environment environment;
 
 	@Value("${namespace.name:TBD}")
 	private String namespaceName;

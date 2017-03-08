@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties()
+@ConfigurationProperties("azure.storage")
 public class AzureStorageProperties extends AzureProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureStorageProperties.class);
@@ -19,10 +19,10 @@ public class AzureStorageProperties extends AzureProperties
 	private static final String PRIMARY_ACCESS_KEY = "primary_access_key";
 	
 	@Value("${storage.account.name:TBD}") 
-	private String storageAccountName;
+	private String accountName;
 	
 	@Value("${storage.account.key:TBD}") 
-	private String storageAccountKey;
+	private String accountKey;
 
 	@PostConstruct
 	private void populateProperties()
@@ -35,37 +35,37 @@ public class AzureStorageProperties extends AzureProperties
 	{
 		try
 		{
-			storageAccountName = creds.getString(STORAGE_ACCOUNT_NAME);
-			storageAccountKey = creds.getString(PRIMARY_ACCESS_KEY);
+			accountName = creds.getString(STORAGE_ACCOUNT_NAME);
+			accountKey = creds.getString(PRIMARY_ACCESS_KEY);
 		} catch (JSONException e)
 		{
 			LOG.error("Error parsing credentials for " + VCAP_SERVICES, e);
 		}
 	}
 
-	public String getStorageAccountName() {
-		return storageAccountName;
+	public String getAccountName() {
+		return accountName;
 	}
 
-	public void setStorageAccountName(String storageAccountName) {
-		this.storageAccountName = storageAccountName;
+	public void setAccountName(String accountName) {
+		this.accountName = accountName;
 	}
 
-	public String getStorageAccountKey() {
-		return storageAccountKey;
+	public String getAccountKey() {
+		return accountKey;
 	}
 
-	public void setStorageAccountKey(String storageAccountKey) {
-		this.storageAccountKey = storageAccountKey;
+	public void setAccountKey(String accountKey) {
+		this.accountKey = accountKey;
 	}
 	
 	public String buildStorageConnectString()
 	{
-		LOG.debug("storage account name = " + getStorageAccountName());
-		LOG.debug("storage account key = " + getStorageAccountKey());
+		LOG.debug("storage account name = " + getAccountName());
+		LOG.debug("storage account key = " + getAccountKey());
 		String storageConnectionString = "DefaultEndpointsProtocol=http;"
-				+ "AccountName=" + getStorageAccountName() + ";" 
-				+ "AccountKey=" + getStorageAccountKey();
+				+ "AccountName=" + getAccountName() + ";"
+				+ "AccountKey=" + getAccountKey();
 	    return storageConnectionString;
 	}
 
