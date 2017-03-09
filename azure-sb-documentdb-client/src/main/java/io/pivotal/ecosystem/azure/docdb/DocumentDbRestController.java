@@ -44,9 +44,9 @@ public class DocumentDbRestController {
 
 	@RequestMapping("/greeting")
 	private List<String> greet(String name) {
-		System.out.println("Dummy Test Method");
+		System.out.println("------ Test Method ------");
 		List<String> greetings = new ArrayList<String>();
-		greetings.add("Helloaodifaoj " + name + "!");
+		greetings.add("Hello " + name + "!");
 		greetings.add("Hola " + name + "!");
 		greetings.add("Namaste " + name + "!");
 		greetings.add("Bon Jour " + name + "!");
