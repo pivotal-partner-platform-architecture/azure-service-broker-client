@@ -19,6 +19,7 @@ package io.pivotal.ecosystem.azure.autoconfigure;
 
 import javax.annotation.PostConstruct;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -34,36 +35,42 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("azure.documentdb")
 public class AzureDocumentDBProperties extends AzureProperties {
 
+	private static final String DOCUMENTDB_SERVICE = "azure-documentdb";
+
+	@Value("${azure.documentdb.resource.id:myresource}")
+	private String resourceId;
+
 	/**
 	 * Adding default values for the below attributes just so the Tests pass
 	 * when running Maven builds
 	 */
-	@Value("${azure.documentdb.resource.id:myresource}")
-	private String resourceId;
-
-	@Value("${vcap.services.${azure.documentdb.service.instance:myservice}.credentials.documentdb_host_endpoint:myhost}")
-	private String hostEndpoint;
-
-	@Value("${vcap.services.${azure.documentdb.service.instance:myservice}.credentials.documentdb_master_key:mymasterkey}")
-	private String masterKey;
-
-	@Value("${vcap.services.${azure.documentdb.service.instance:myservice}.credentials.documentdb_database_id:mydatabaseid}")
-	private String databaseId;
-
-	@Value("${vcap.services.${azure.documentdb.service.instance:myservice}.credentials.documentdb_database_link:mydatabaselink}")
-	private String link;
-
-	@Override
-	protected void populateCallback(JSONObject credentials) {
-		// revisit: need to implement this method?
-		System.out.println("INSIDE AzureDocumentDBProperties.populateCallback");
-	}
+	private String hostEndpoint = "TBD";
+	private String masterKey = "TBD";
+	private String databaseId = "TBD";
+	private String link = "TBD";
 
 	@PostConstruct
 	private void populateProperties() {
-		super.populate("");
+		super.populate(DOCUMENTDB_SERVICE);
 		System.out
 				.println("INSIDE AzureDocumentDBProperties.populateProperties");
+	}
+
+	@Override
+	protected void populateCallback(JSONObject credentials) {
+		System.out
+				.println("ENTERING AzureDocumentDBProperties.populateCallback");
+		try {
+			hostEndpoint = credentials.getString("documentdb_host_endpoint");
+			masterKey = credentials.getString("documentdb_master_key");
+			databaseId = credentials.getString("documentdb_database_id");
+			link = credentials.getString("documentdb_database_link");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out
+				.println("EXITING AzureDocumentDBProperties.populateCallback");
 	}
 
 	public String getResourceId() {
