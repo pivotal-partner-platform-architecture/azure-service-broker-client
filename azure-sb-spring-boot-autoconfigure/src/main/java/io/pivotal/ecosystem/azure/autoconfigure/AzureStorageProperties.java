@@ -19,14 +19,14 @@ package io.pivotal.ecosystem.azure.autoconfigure;
 
 import javax.annotation.PostConstruct;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.env.Environment;
 
 @ConfigurationProperties("azure.storage.account")
-public class AzureStorageProperties extends AzureProperties
+public class AzureStorageProperties 
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureStorageProperties.class);
 
@@ -34,25 +34,29 @@ public class AzureStorageProperties extends AzureProperties
 	private static final String STORAGE_ACCOUNT_NAME = "storage_account_name";
 	private static final String PRIMARY_ACCESS_KEY = "primary_access_key";
 	
+	@Autowired
+	private VcapParser parser;
+	
 	private String name = "TBD";
 	private String key = "TBD";
+
+	@Autowired
+	private Environment environment;
 
 	@PostConstruct
 	private void populateProperties()
 	{
-		super.populate(AZURE_STORAGE);
-	}
-
-	@Override
-	protected void populateCallback(JSONObject creds)
-	{
-		try
+		String vcapServices = environment.getProperty(VcapParser.VCAP_SERVICES);
+		VcapPojo[] pojos = parser.parse(vcapServices);
+		for (int i=0; i<pojos.length; i++)
 		{
-			name = creds.getString(STORAGE_ACCOUNT_NAME);
-			key = creds.getString(PRIMARY_ACCESS_KEY);
-		} catch (JSONException e)
-		{
-			LOG.error("Error parsing credentials for " + VCAP_SERVICES, e);
+			VcapPojo pojo = pojos[i];
+			if (AZURE_STORAGE.equals(pojo.getServiceBrokerName()))
+			{
+				LOG.debug("Found the storage key");
+				name = pojo.getCredentials().get(STORAGE_ACCOUNT_NAME);
+				key = pojo.getCredentials().get(PRIMARY_ACCESS_KEY);
+			}
 		}
 	}
 
@@ -64,21 +68,20 @@ public class AzureStorageProperties extends AzureProperties
 		this.name = accountName;
 	}
 
-	public String getAccountKey() {
+	public String getKey() {
 		return key;
 	}
 
-	public void setAccountKey(String accountKey) {
+	public void setKey(String accountKey) {
 		this.key = accountKey;
 	}
 	
 	public String buildStorageConnectString()
 	{
-		LOG.debug("storage account name = " + getName());
-		LOG.debug("storage account key = " + getAccountKey());
 		String storageConnectionString = "DefaultEndpointsProtocol=http;"
 				+ "AccountName=" + getName() + ";"
-				+ "AccountKey=" + getAccountKey();
+				+ "AccountKey=" + getKey();
+		LOG.debug("storageConnectionString = " + storageConnectionString);
 	    return storageConnectionString;
 	}
 	
@@ -87,7 +90,4 @@ public class AzureStorageProperties extends AzureProperties
 	{
 		return "AzureStorageProperties [accountName=" + name + ", accountKey=" + key + "]";
 	}
-
-
-
 }

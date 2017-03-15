@@ -1,0 +1,24 @@
+{
+  "azure-sqldb": [
+   {
+    "credentials": {
+     "administratorLogin": "userid",
+     "administratorLoginPassword": "password",
+     "jdbcUrl": "jdbc:sqlserver://hostname:1433;database=dbname;user=user;password=pw",
+     "sqlServerName": "sql-server-name",
+     "sqldbName": "db-name"
+    },
+    "label": "azure-sqldb",
+    "name": "myazuredb-service",
+    "plan": "basic",
+    "provider": "provider",
+    "syslog_drain_url": "drain_url",
+    "tags": [
+     "Azure",
+     "SQL"
+    ],
+    "volume_mounts": []
+   }
+  ]
+}
+
