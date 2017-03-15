@@ -26,12 +26,12 @@ mvn clean package
 ```
 
 # Run the projects
-[SQL Server client] (azure-sb-sql-server-client/README.md)
+[SQL Server client](azure-sb-sql-server-client/README.md)
 
-[Storage client] (azure-sb-storage-client/README.md)
+[Storage client](azure-sb-storage-client/README.md)
 
-[Service Bus client] (azure-sb-service-bus-client/README.md)
+[Service Bus client](azure-sb-service-bus-client/README.md)
 
-[Redis client] (azure-sb-redis-client/README.md)
+[Redis client](azure-sb-redis-client/README.md)
 
-[DocumentDB client] (azure-sb-documentdb-client/README.md)
+[DocumentDB client](azure-sb-documentdb-client/README.md)
