@@ -19,15 +19,14 @@ package io.pivotal.ecosystem.azure.autoconfigure;
 
 import javax.annotation.PostConstruct;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.env.Environment;
 
 @ConfigurationProperties("azure.servicebus")
-public class AzureSbServiceBusProperties extends AzureProperties
+public class AzureSbServiceBusProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureSbServiceBusProperties.class);
 
@@ -37,44 +36,41 @@ public class AzureSbServiceBusProperties extends AzureProperties
 	private static final String NAMESPACE_NAME = "namespace_name";
 	private static final String AZURE_SERVICE_BUS_DOMAIN = "servicebus.windows.net";
 
-	@Value("${namespace.name:TBD}")
-	private String namespaceName;
+	@Autowired
+	private VcapParser parser;
 
-	@Value("${shared.access.name:TBD}")
-	private String sharedAccessName;
+	@Autowired
+	private Environment environment;
 
-	@Value("${shared.access.key.value:TBD}")
-	private String sharedAccessKeyValue;
+	private String namespaceName = "TBD";
+	private String sharedAccessName = "TBD";
+	private String sharedAccessKeyValue = "TBD";
 
 	@PostConstruct
 	private void populateProperties()
 	{
-		super.populate(AZURE_SERVICEBUS);
-	}
-
-	@Override
-	protected void populateCallback(JSONObject creds)
-	{
-		try
+		String vcapServices = environment.getProperty(VcapParser.VCAP_SERVICES);
+		VcapPojo[] pojos = parser.parse(vcapServices);
+		for (int i=0; i<pojos.length; i++)
 		{
-			namespaceName = creds.getString(NAMESPACE_NAME);
-			sharedAccessName = creds.getString(SHARED_ACCESS_NAME);
-			sharedAccessKeyValue = creds.getString(SHARED_ACCESS_KEY_VALUE);
-		} catch (JSONException e)
-		{
-			LOG.error("Error parsing credentials for " + VCAP_SERVICES, e);
+			VcapPojo pojo = pojos[i];
+			if (AZURE_SERVICEBUS.equals(pojo.getServiceBrokerName()))
+			{
+				LOG.debug("Found the service bus key");
+				namespaceName = pojo.getCredentials().get(NAMESPACE_NAME);
+				sharedAccessName = pojo.getCredentials().get(SHARED_ACCESS_NAME);
+				sharedAccessKeyValue = pojo.getCredentials().get(SHARED_ACCESS_KEY_VALUE);
+			}
 		}
 	}
 
 	public String buildServiceBusConnectString()
 	{
-		LOG.debug("namespace name = " + getNamespaceName());
-		LOG.debug("shared access name = " + getSharedAccessName());
-		LOG.debug("shared access key value = " + getSharedAccessKeyValue());
 		String connectionString = 
 				  "Endpoint=sb://" + getNamespaceName() + "." + AZURE_SERVICE_BUS_DOMAIN + "/;" 
 				+ "SharedAccessKeyName=" + getSharedAccessName() + ";" 
 				+ "SharedAccessKey=" + getSharedAccessKeyValue();
+		LOG.debug("connectionString name = " + connectionString);
 		return connectionString;
 	}
 
@@ -108,4 +104,12 @@ public class AzureSbServiceBusProperties extends AzureProperties
 		this.sharedAccessKeyValue = sharedAccessKeyValue;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "AzureSbServiceBusProperties [parser=" + parser + ", environment=" + environment + ", namespaceName=" + namespaceName
+				+ ", sharedAccessName=" + sharedAccessName + ", sharedAccessKeyValue=" + sharedAccessKeyValue + "]";
+	}
+
+	
 }
