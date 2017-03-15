@@ -26,9 +26,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 
 @ConfigurationProperties("azure.servicebus")
-public class AzureSbServiceBusProperties
+public class AzureServiceBusProperties
 {
-	private static final Logger LOG = LoggerFactory.getLogger(AzureSbServiceBusProperties.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AzureServiceBusProperties.class);
 
 	private static final String AZURE_SERVICEBUS = "azure-servicebus";
 	private static final String SHARED_ACCESS_NAME = "shared_access_key_name";

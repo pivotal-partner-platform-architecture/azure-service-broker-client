@@ -36,12 +36,12 @@ public class AzureStorageProperties
 	
 	@Autowired
 	private VcapParser parser;
-	
-	private String name = "TBD";
-	private String key = "TBD";
 
 	@Autowired
 	private Environment environment;
+	
+	private String name = "TBD";
+	private String key = "TBD";
 
 	@PostConstruct
 	private void populateProperties()

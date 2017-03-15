@@ -31,15 +31,15 @@ import com.microsoft.windowsazure.services.servicebus.ServiceBusService;
 
 @Configuration
 @ConditionalOnMissingBean(ServiceBusContract.class)
-@EnableConfigurationProperties(AzureSbServiceBusProperties.class)
+@EnableConfigurationProperties(AzureServiceBusProperties.class)
 public class AzureServiceBusAutoConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureServiceBusAutoConfiguration.class);
 	private static final String TBD = "TBD";
 
-	private final AzureSbServiceBusProperties properties;
+	private final AzureServiceBusProperties properties;
 
-	public AzureServiceBusAutoConfiguration(AzureSbServiceBusProperties properties) {
+	public AzureServiceBusAutoConfiguration(AzureServiceBusProperties properties) {
 		this.properties = properties;
 	}
 

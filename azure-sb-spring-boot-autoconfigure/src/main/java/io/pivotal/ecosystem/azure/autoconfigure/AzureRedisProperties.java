@@ -19,15 +19,14 @@ package io.pivotal.ecosystem.azure.autoconfigure;
 
 import javax.annotation.PostConstruct;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.env.Environment;
 
 @ConfigurationProperties("azure.redis")
-public class AzureRedisProperties extends AzureProperties
+public class AzureRedisProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureRedisProperties.class);
 
@@ -36,32 +35,31 @@ public class AzureRedisProperties extends AzureProperties
 	private static final String SSL_PORT = "sslPort";
 	private static final String PRIMARY_KEY = "primaryKey";
 
-	@Value("${host.name:TBD}")
-	private String hostname;
+	@Autowired
+	private VcapParser parser;
 
-	@Value("${ssl.port:TBD}")
-	private String sslPort;
-
-	@Value("${primary.key:TBD}")
-	private String primaryKey;
+	@Autowired
+	private Environment environment;
+	
+	private String hostname = "TBD";
+	private String sslPort = "TBD";
+	private String primaryKey = "TBD";
 
 	@PostConstruct
 	private void populateProperties()
 	{
-		super.populate(AZURE_REDISCACHE);
-	}
-
-	@Override
-	protected void populateCallback(JSONObject creds)
-	{
-		try
+		String vcapServices = environment.getProperty(VcapParser.VCAP_SERVICES);
+		VcapPojo[] pojos = parser.parse(vcapServices);
+		for (int i=0; i<pojos.length; i++)
 		{
-			hostname = creds.getString(HOST_NAME);
-			sslPort = creds.getString(SSL_PORT);
-			primaryKey = creds.getString(PRIMARY_KEY);
-		} catch (JSONException e)
-		{
-			LOG.error("Error parsing credentials for " + VCAP_SERVICES, e);
+			VcapPojo pojo = pojos[i];
+			if (AZURE_REDISCACHE.equals(pojo.getServiceBrokerName()))
+			{
+				LOG.debug("Found the redis cache key");
+				hostname = pojo.getCredentials().get(HOST_NAME);
+				sslPort = pojo.getCredentials().get(SSL_PORT);
+				primaryKey = pojo.getCredentials().get(PRIMARY_KEY);
+			}
 		}
 	}
 
@@ -95,4 +93,12 @@ public class AzureRedisProperties extends AzureProperties
 		this.primaryKey = primaryKey;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "AzureRedisProperties [parser=" + parser + ", environment=" + environment + ", hostname=" + hostname + ", sslPort="
+				+ sslPort + ", primaryKey=" + primaryKey + "]";
+	}
+
+	
 }

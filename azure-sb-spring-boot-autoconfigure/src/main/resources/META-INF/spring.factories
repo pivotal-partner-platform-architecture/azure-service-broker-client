@@ -1,5 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-io.pivotal.ecosystem.azure.autoconfigure.AzureServiceBrokerAutoConfiguration,\
 io.pivotal.ecosystem.azure.autoconfigure.AzureRedisAutoConfiguration,\
 io.pivotal.ecosystem.azure.autoconfigure.AzureServiceBusAutoConfiguration,\
 io.pivotal.ecosystem.azure.autoconfigure.AzureStorageAutoConfiguration,\
