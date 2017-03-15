@@ -19,10 +19,11 @@ package io.pivotal.ecosystem.azure.autoconfigure;
 
 import javax.annotation.PostConstruct;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.env.Environment;
 
 /**
  * 
@@ -33,12 +34,23 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *         azure-sb-documentdb-client project's application.properties
  */
 @ConfigurationProperties("azure.documentdb")
-public class AzureDocumentDBProperties extends AzureProperties {
+public class AzureDocumentDBProperties
+{
+	private static final Logger LOG = LoggerFactory.getLogger(AzureDocumentDBProperties.class);
 
 	private static final String DOCUMENTDB_SERVICE = "azure-documentdb";
+	private static final String HOST_ENDPOINT = "documentdb_host_endpoint";
+	private static final String MASTER_KEY = "documentdb_master_key";
+	private static final String DATABASE_ID = "documentdb_database_id";
+	private static final String DATABASE_LINK = "documentdb_database_link";
 
-	@Value("${azure.documentdb.resource.id:myresource}")
-	private String resourceId;
+	@Autowired
+	private VcapParser parser;
+
+	@Autowired
+	private Environment environment;
+
+	private String resourceId = "myresource";
 
 	/**
 	 * Adding default values for the below attributes just so the Tests pass
@@ -50,67 +62,81 @@ public class AzureDocumentDBProperties extends AzureProperties {
 	private String link = "TBD";
 
 	@PostConstruct
-	private void populateProperties() {
-		super.populate(DOCUMENTDB_SERVICE);
-		System.out
-				.println("INSIDE AzureDocumentDBProperties.populateProperties");
-	}
-
-	@Override
-	protected void populateCallback(JSONObject credentials) {
-		System.out
-				.println("ENTERING AzureDocumentDBProperties.populateCallback");
-		try {
-			hostEndpoint = credentials.getString("documentdb_host_endpoint");
-			masterKey = credentials.getString("documentdb_master_key");
-			databaseId = credentials.getString("documentdb_database_id");
-			link = credentials.getString("documentdb_database_link");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	private void populateProperties()
+	{
+		String vcapServices = environment.getProperty(VcapParser.VCAP_SERVICES);
+		VcapPojo[] pojos = parser.parse(vcapServices);
+		for (int i = 0; i < pojos.length; i++)
+		{
+			VcapPojo pojo = pojos[i];
+			if (DOCUMENTDB_SERVICE.equals(pojo.getServiceBrokerName()))
+			{
+				LOG.debug("Found the documentdb key");
+				hostEndpoint = pojo.getCredentials().get(HOST_ENDPOINT);
+				masterKey = pojo.getCredentials().get(MASTER_KEY);
+				databaseId = pojo.getCredentials().get(DATABASE_ID);
+				link = pojo.getCredentials().get(DATABASE_LINK);
+			}
 		}
-		System.out
-				.println("EXITING AzureDocumentDBProperties.populateCallback");
+		LOG.debug("INSIDE populateProperties");
 	}
 
-	public String getResourceId() {
+	public String getResourceId()
+	{
 		return resourceId;
 	}
 
-	public void setResourceId(String resourceId) {
+	public void setResourceId(String resourceId)
+	{
 		this.resourceId = resourceId;
 	}
 
-	public String getHostEndpoint() {
+	public String getHostEndpoint()
+	{
 		return hostEndpoint;
 	}
 
-	public void setHostEndpoint(String hostEndpoint) {
+	public void setHostEndpoint(String hostEndpoint)
+	{
 		this.hostEndpoint = hostEndpoint;
 	}
 
-	public String getMasterKey() {
+	public String getMasterKey()
+	{
 		return masterKey;
 	}
 
-	public void setMasterKey(String masterKey) {
+	public void setMasterKey(String masterKey)
+	{
 		this.masterKey = masterKey;
 	}
 
-	public String getDatabaseId() {
+	public String getDatabaseId()
+	{
 		return databaseId;
 	}
 
-	public void setDatabaseId(String databaseId) {
+	public void setDatabaseId(String databaseId)
+	{
 		this.databaseId = databaseId;
 	}
 
-	public String getLink() {
+	public String getLink()
+	{
 		return link;
 	}
 
-	public void setLink(String link) {
+	public void setLink(String link)
+	{
 		this.link = link;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "AzureDocumentDBProperties [parser=" + parser + ", environment=" + environment + ", resourceId=" + resourceId
+				+ ", hostEndpoint=" + hostEndpoint + ", masterKey=" + masterKey + ", databaseId=" + databaseId + ", link=" + link + "]";
+	}
+
+	
 }

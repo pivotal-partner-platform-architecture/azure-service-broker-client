@@ -92,11 +92,11 @@ public class VcapParser
 			try
 			{
 				JSONObject service = azureService.getJSONObject(i);
-				result.setLabel(service.getString(LABEL));
-				result.setProvider(service.getString(PROVIDER));
-				result.setServiceInstanceName(service.getString(NAME));
-				result.setServicePlan(service.getString(PLAN));
-				result.setSyslogDrainUrl(service.getString(SYSLOG_DRAIN_URL));
+				result.setLabel(parseString(service, LABEL));
+				result.setProvider(parseString(service, PROVIDER));
+				result.setServiceInstanceName(parseString(service, NAME));
+				result.setServicePlan(parseString(service, PLAN));
+				result.setSyslogDrainUrl(parseString(service, SYSLOG_DRAIN_URL));
 				result.setTags(parseStringArray(service.getJSONArray(TAGS)));
 				result.setVolumeMounts(parseStringArray(service.getJSONArray(VOLUME_MOUNTS)));
 
@@ -107,7 +107,7 @@ public class VcapParser
 				}
 			} catch (JSONException e)
 			{
-				LOG.error("Found " + serviceBrokerName + ", but missing " + CREDENTIALS + " : " + vCapServices);
+				LOG.error("Found " + serviceBrokerName + ", but missing " + CREDENTIALS + " : " + vCapServices, e);
 			}
 		}
 		return result;
@@ -148,5 +148,23 @@ public class VcapParser
 			}
 		}
 		LOG.debug(mapObject.names().toString());
+	}
+	
+	private String parseString(JSONObject service, String key)
+	{
+		String result = null;
+		
+		try
+		{
+			if (! service.isNull(key))
+			{
+				result = service.getString(key);
+			}
+		} catch (JSONException e)
+		{
+			LOG.error("Error parsing " + service, e);
+		}
+
+		return result;
 	}
 }

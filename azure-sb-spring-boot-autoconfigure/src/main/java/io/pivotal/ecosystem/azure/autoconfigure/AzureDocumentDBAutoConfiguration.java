@@ -17,11 +17,14 @@
 
 package io.pivotal.ecosystem.azure.autoconfigure;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import com.microsoft.azure.documentdb.ConnectionPolicy;
 import com.microsoft.azure.documentdb.ConsistencyLevel;
@@ -35,7 +38,9 @@ import com.microsoft.azure.documentdb.DocumentClient;
 @Configuration
 @ConditionalOnMissingBean(DocumentClient.class)
 @EnableConfigurationProperties(AzureDocumentDBProperties.class)
-public class AzureDocumentDBAutoConfiguration {
+public class AzureDocumentDBAutoConfiguration 
+{
+	private static final Logger LOG = LoggerFactory.getLogger(AzureDocumentDBAutoConfiguration.class);
 
 	private final AzureDocumentDBProperties properties;
 
@@ -45,9 +50,12 @@ public class AzureDocumentDBAutoConfiguration {
 	}
 
 	@Bean
+	@Profile("!testing")
 	public DocumentClient documentClient() {
 		String hostname = properties.getHostEndpoint();
 		String masterkey = properties.getMasterKey();
+		LOG.debug("hostname = " + hostname);
+		LOG.debug("masterkey = " + masterkey);
 		return new DocumentClient(hostname, masterkey,
 				ConnectionPolicy.GetDefault(), ConsistencyLevel.Session);
 	}

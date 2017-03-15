@@ -85,4 +85,41 @@ public class VcapParserTest
 
 	}
 	
+	@Test
+	public void testVcapSingleServiceWithNulls()
+	{
+		Resource resource = new ClassPathResource("/vcap2.json");
+		String content;
+		try
+		{
+			content = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+			VcapPojo[] pojos = parser.parse(content);
+			assertNotNull(pojos);
+			assertEquals(1, pojos.length);
+			VcapPojo pojo = pojos[0];
+			
+			LOG.debug("pojo = " + pojo);
+			assertEquals(4, pojo.getCredentials().size());
+			assertEquals(0, pojo.getTags().length);
+			assertEquals(0, pojo.getVolumeMounts().length);
+			assertEquals("azure-documentdb", pojo.getLabel());
+			assertNull(pojo.getProvider());
+			assertEquals("azure-documentdb", pojo.getServiceBrokerName());
+			assertEquals("mydocumentdb", pojo.getServiceInstanceName());
+			assertEquals("standard", pojo.getServicePlan());
+			assertNull(pojo.getSyslogDrainUrl());
+			
+			assertEquals("docdb123mj", pojo.getCredentials().get("documentdb_database_id"));
+			assertEquals("dbs/ZFxCAA==/", pojo.getCredentials().get("documentdb_database_link"));
+			assertEquals("https://hostname:443/", pojo.getCredentials().get("documentdb_host_endpoint"));
+			assertEquals("3becR7JFnWamMvGwWYWWTV4WpeNhN8tOzJ74yjAxPKDpx65q2lYz60jt8WXU6HrIKrAIwhs0Hglf0123456789==", pojo.getCredentials().get("documentdb_master_key"));
+		} 
+		catch (IOException e)
+		{
+			LOG.error("Error reading json file", e);
+		}
+		
+
+	}
+
 }
