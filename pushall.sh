@@ -10,6 +10,9 @@ cd ..
 cd azure-sb-sql-server-client
 cf push
 cd ..
+cd azure-sb-documentdb-client
+cf push
+cd ..
 cf apps
 cf services
 
