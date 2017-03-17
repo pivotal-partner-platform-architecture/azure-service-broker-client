@@ -45,6 +45,9 @@ the following endpoints:
 and stores it in a new storage container on Azure (under the storage account name you specified above), and displays it.  It pulls the
 Azure credentials from the VCAP_SERVICES environment variable that PCF populates when you bind the service to the app.
 
+* "/blob2" - same as above, except it stores the image in 2 different azure storage accounts mapped to 
+two different service instances.
+
 * "/table" - this demo uses the Table NoSQL storage feature to create a new table and populate it with a java object identified by
 a partition and row key.
 
