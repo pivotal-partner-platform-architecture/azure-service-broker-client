@@ -17,6 +17,8 @@
 
 package io.pivotal.ecosystem.azure.storage.queue;
 
+import io.pivotal.ecosystem.azure.autoconfigure.AzureStorageAutoConfiguration.CloudStorageAccountFactory;
+
 import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +43,9 @@ public class QueueRestController
 
 	@Autowired
 	private CloudStorageAccount account;
+	
+	@Autowired
+	private CloudStorageAccountFactory factory;
 
 	@RequestMapping(value = "/queue", method = RequestMethod.GET)
 	public String process(HttpServletResponse response)
@@ -51,6 +56,17 @@ public class QueueRestController
 		try
 		{
 			result.append("Connecting to storage account..." + CR);
+			if (account == null)
+			{
+				account = factory.createAccountByServiceInstanceName("mystorage");
+				if (account == null)
+				{
+					String message = "CloudStorageAccount object not injected, lookup by name failed.";
+					LOG.error(message);
+					throw new RuntimeException(message);
+				}
+			}
+			
 			result.append("Creating queue..." + CR);
 			CloudQueueClient queueClient = account.createCloudQueueClient();
 			CloudQueue queue = queueClient.getQueueReference("productqueue");

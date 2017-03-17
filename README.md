@@ -1,6 +1,10 @@
 # azure-service-broker-client
 Demo application for client applications consuming azure services exposed through the PCF Azure Service Broker.  These examples leverage a common Spring Boot Starter project for Azure services, which make it easier to isolate Azure dependencies, and inject commonly used Azure objects into your client applications.
 
+Most of the applications are written to support a single service instance, which can be automatically
+injected into your code.  Occasionally you need to support two instances of the same service type, which
+requires some additional coding.  For this case, see the azure-sb-storage-client example.
+
 # Description
 This demo is composed of the following applications:
 
@@ -8,7 +12,10 @@ This demo is composed of the following applications:
 This application is a simple SQL Server database client
 
 ## azure-sb-storage-client
-This application is a storage client using the Blob, Table, Queue, Disk, and File storage capabilities
+This application is a storage client using the Blob, Table, Queue, Disk, and File storage capabilities.  This
+application also demonstrates how to support two different storage service instances bound to the same
+application.  In this case, some code is required to connect the right client object to the right
+service instance.
 
 ## azure-sb-documentdb-client
 This application is a simple DocumentDB client

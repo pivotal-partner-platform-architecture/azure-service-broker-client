@@ -1,0 +1,40 @@
+{
+  "azure-rediscache": [
+   {
+    "credentials": {
+     "hostname": "hostname",
+     "name": "username",
+     "port": 6379,
+     "primaryKey": "DIK5TNeN6qFhrF6ATpxLLIZ7SpNMDg9xU+0123456789",
+     "secondaryKey": "nP/eeEyCo2c11UP1g4D5KgZgQN8bfR6clM0123456789=",
+     "sslPort": 6380
+    },
+    "label": "azure-rediscache",
+    "name": "myredis",
+    "plan": "basic",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": [],
+    "volume_mounts": []
+   }
+  ],
+  "azure-storage": [
+   {
+    "credentials": {
+     "primary_access_key": "Vrpr5RGe7lf9FgNNmsrzYY9N8PUB1USAJLbDE2oytjD+3bUJXjt0H6Uwu+wGaQ+icyakQLNI8g8t0123456789==",
+     "secondary_access_key": "7Dp5E253piI0rsfx1EIsSpw2ZQaJVe5uq56+OyEnom3wgC7DQs2jVbEwIL+90a7+u5xdLOzxxy0d0123456789==",
+     "storage_account_name": "storage"
+    },
+    "label": "azure-storage",
+    "name": "mystorage",
+    "plan": "standard",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": [
+     "Azure",
+     "Storage"
+    ],
+    "volume_mounts": []
+   }
+  ]
+ }

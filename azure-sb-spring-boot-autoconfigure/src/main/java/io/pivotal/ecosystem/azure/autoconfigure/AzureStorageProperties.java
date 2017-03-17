@@ -31,6 +31,7 @@ public class AzureStorageProperties
 	private static final Logger LOG = LoggerFactory.getLogger(AzureStorageProperties.class);
 
 	private static final String AZURE_STORAGE = "azure-storage";
+	private static final String TBD = "TBD";
 	private static final String STORAGE_ACCOUNT_NAME = "storage_account_name";
 	private static final String PRIMARY_ACCESS_KEY = "primary_access_key";
 	
@@ -40,26 +41,48 @@ public class AzureStorageProperties
 	@Autowired
 	private Environment environment;
 	
-	private String name = "TBD";
-	private String key = "TBD";
+	private String name = TBD;
+	private String key = TBD;
 
+	private VcapResult result;
+	
 	@PostConstruct
 	private void populateProperties()
 	{
 		String vcapServices = environment.getProperty(VcapParser.VCAP_SERVICES);
-		VcapPojo[] pojos = parser.parse(vcapServices);
-		for (int i=0; i<pojos.length; i++)
+		result = parser.parse(vcapServices); 
+		switch  (result.findCountByServiceType(VcapServiceType.AZURE_STORAGE))
 		{
-			VcapPojo pojo = pojos[i];
-			if (AZURE_STORAGE.equals(pojo.getServiceBrokerName()))
+		case 0:
+			LOG.info("No services of type " + VcapServiceType.AZURE_STORAGE.toString() + " found.");
+			break;
+		case 1:
+			LOG.info("One services of type " + VcapServiceType.AZURE_STORAGE.toString() + " found.");
+			VcapPojo pojo = result.findByServiceType(VcapServiceType.AZURE_STORAGE);
+			if (pojo != null)
 			{
 				LOG.debug("Found the storage key");
 				name = pojo.getCredentials().get(STORAGE_ACCOUNT_NAME);
 				key = pojo.getCredentials().get(PRIMARY_ACCESS_KEY);
 			}
+			break;
+		default:
+			LOG.warn("More than one service of type " + VcapServiceType.AZURE_STORAGE.toString() + " found, cannot autoconfigure service, must use factory instead.");
+			break;
 		}
 	}
 
+	public void populatePropertiesForServiceInstance(String serviceInstanceName)
+	{
+		VcapPojo pojo = result.findByServiceTypeAndServiceInstanceName(VcapServiceType.AZURE_STORAGE, serviceInstanceName);
+		if (pojo != null)
+		{
+			LOG.debug("Found the storage key for service instance name " + serviceInstanceName);
+			name = pojo.getCredentials().get(STORAGE_ACCOUNT_NAME);
+			key = pojo.getCredentials().get(PRIMARY_ACCESS_KEY);
+		}
+	}
+	
 	public String getName() {
 		return name;
 	}

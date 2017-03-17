@@ -17,6 +17,8 @@
 
 package io.pivotal.ecosystem.azure.storage.blob;
 
+import io.pivotal.ecosystem.azure.autoconfigure.AzureStorageAutoConfiguration.CloudStorageAccountFactory;
+
 import java.io.InputStream;
 import java.net.URL;
 
@@ -38,25 +40,42 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
 
 @RestController
-public class StorageRestController {
+public class StorageRestController
+{
 
 	private static final Logger LOG = LoggerFactory.getLogger(StorageRestController.class);
 
 	public static final String IMAGE_PATH = "https://raw.githubusercontent.com/mjeffries-pivotal/pcf-samples/master/images/azure-pcf.jpg";
-	
+
 	@Autowired
 	private CloudStorageAccount account;
 
+	@Autowired
+	private CloudStorageAccountFactory factory;
+
 	@RequestMapping(value = "/blob", method = RequestMethod.GET)
-	public @ResponseBody void showBlob(HttpServletResponse response) {
-		try {
+	public @ResponseBody void showBlob(HttpServletResponse response)
+	{
+		try
+		{
 			LOG.info("showBlob start");
+			if (account == null)
+			{
+				account = factory.createAccountByServiceInstanceName("mystorage");
+				if (account == null)
+				{
+					String message = "CloudStorageAccount object not injected, lookup by name failed.";
+					LOG.error(message);
+					throw new RuntimeException(message);
+				}
+			}
+
 			URL u = new URL(IMAGE_PATH);
 			InputStream is = u.openStream();
 			response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-		    int imageSize = IOUtils.copy(is, response.getOutputStream());
-		    
-		    LOG.debug("Connecting to storage account...");
+			int imageSize = IOUtils.copy(is, response.getOutputStream());
+
+			LOG.debug("Connecting to storage account...");
 			CloudBlobClient serviceClient = account.createCloudBlobClient();
 
 			// Container name must be lower case.
@@ -68,10 +87,57 @@ public class StorageRestController {
 			CloudBlockBlob blob = container.getBlockBlobReference("image1.jpg");
 			blob.upload(new URL(IMAGE_PATH).openStream(), imageSize);
 			LOG.debug("Uploading image complete");
-			
-		} catch (Exception e) {
+
+		} catch (Exception e)
+		{
 			LOG.error("Error processing request ", e);
 		}
 	}
-	
+
+	@RequestMapping(value = "/blob2", method = RequestMethod.GET)
+	public @ResponseBody void showCopy(HttpServletResponse response)
+	{
+		try
+		{
+			LOG.info("showCopy start");
+
+			CloudStorageAccount account1 = factory.createAccountByServiceInstanceName("mystorage");
+			CloudStorageAccount account2 = factory.createAccountByServiceInstanceName("mystorage2");
+
+			URL u = new URL(IMAGE_PATH);
+			InputStream is = u.openStream();
+			response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+			int imageSize = IOUtils.copy(is, response.getOutputStream());
+
+			LOG.debug("Connecting to storage account 1...");
+			CloudBlobClient serviceClient1 = account1.createCloudBlobClient();
+
+			// Container name must be lower case.
+			CloudBlobContainer container = serviceClient1.getContainerReference("myimages");
+			container.createIfNotExists();
+
+			// Upload an image file.
+			LOG.debug("Uploading image...");
+			CloudBlockBlob blob = container.getBlockBlobReference("image1.jpg");
+			blob.upload(new URL(IMAGE_PATH).openStream(), imageSize);
+			LOG.debug("Uploading image complete to account 1");
+
+			LOG.debug("Connecting to storage account 2...");
+			CloudBlobClient serviceClient2 = account2.createCloudBlobClient();
+
+			// Container name must be lower case.
+			container = serviceClient2.getContainerReference("myimages");
+			container.createIfNotExists();
+
+			// Upload an image file.
+			LOG.debug("Uploading image...");
+			blob = container.getBlockBlobReference("image1.jpg");
+			blob.upload(new URL(IMAGE_PATH).openStream(), imageSize);
+			LOG.debug("Uploading image complete to account 2");
+		} catch (Exception e)
+		{
+			LOG.error("Error processing request ", e);
+		}
+	}
+
 }

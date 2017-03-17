@@ -50,13 +50,20 @@ public class AzureRedisAutoConfiguration
 		if (! TBD.equals(properties.getHostname()))
 		{
 			LOG.info("Creating JedisConnectionFactory...");
-			cf = new JedisConnectionFactory();
-			cf.setHostName(properties.getHostname());
-			cf.setPort(Integer.valueOf(properties.getSslPort()));
-			cf.setPassword(properties.getPrimaryKey());
-			cf.setUseSsl(true);
-			cf.afterPropertiesSet();
-			LOG.info("Created JedisConnectionFactory...");
+			try
+			{
+				cf = new JedisConnectionFactory();
+				cf.setHostName(properties.getHostname());
+				cf.setPort(Integer.valueOf(properties.getSslPort()));
+				cf.setPassword(properties.getPrimaryKey());
+				cf.setUseSsl(true);
+				cf.afterPropertiesSet();
+				LOG.info("Created JedisConnectionFactory...");
+			}
+			catch (NoClassDefFoundError e)
+			{
+				LOG.error("Required Redis classes not in classpath!", e);
+			}
 		}
 		return cf;
 	}

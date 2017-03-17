@@ -48,18 +48,50 @@ public class AzureStorageAutoConfiguration
 	@Profile("!testing")
 	public CloudStorageAccount cloudStorageAccount()
 	{
+		LOG.debug("cloudStorageAccount called, account name = " + properties.getName());
+		return createCloudStorageAccount();
+	}
+	
+	@Bean
+	@Profile("!testing")
+	public CloudStorageAccountFactory cloudStorageAccountFactory()
+	{
+		return new CloudStorageAccountFactory();
+	}
+	
+	public class CloudStorageAccountFactory
+	{
+		public CloudStorageAccount createAccountByServiceInstanceName(String serviceInstanceName)
+		{
+			LOG.debug("creating CloudStorageAccount for serviceInstanceName = " + serviceInstanceName);
+			
+			properties.populatePropertiesForServiceInstance(serviceInstanceName);
+			
+			CloudStorageAccount account = createCloudStorageAccount();
+			LOG.debug("created account " + account);
+			return account;
+		}
+	}
+	
+	private CloudStorageAccount createCloudStorageAccount()
+	{
+		LOG.debug("createCloudStorageAccount called, account name = " + properties.getName());
+		
 		CloudStorageAccount account = null;
 		if (! TBD.equals(properties.getName()))
 		{
 			try
 			{
-				account = CloudStorageAccount.parse(properties.buildStorageConnectString());
+				String connectionString = properties.buildStorageConnectString();
+				LOG.debug("Connection String is " + connectionString);
+				account = CloudStorageAccount.parse(connectionString);
+				LOG.debug("createCloudStorageAccount created account " + account);
 			} catch (InvalidKeyException e)
 			{
-				LOG.error("Error processing request ", e);
+				LOG.error("Error creating createCloudStorageAccount", e);
 			} catch (URISyntaxException e)
 			{
-				LOG.error("Error processing request ", e);
+				LOG.error("Error creating createCloudStorageAccount", e);
 			}
 		}
 		return account;

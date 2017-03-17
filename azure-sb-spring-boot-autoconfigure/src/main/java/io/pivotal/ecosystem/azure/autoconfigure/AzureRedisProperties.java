@@ -49,7 +49,9 @@ public class AzureRedisProperties
 	private void populateProperties()
 	{
 		String vcapServices = environment.getProperty(VcapParser.VCAP_SERVICES);
-		VcapPojo[] pojos = parser.parse(vcapServices);
+		VcapResult result = parser.parse(vcapServices); 
+		VcapPojo[] pojos = result.getPojos();
+
 		for (int i=0; i<pojos.length; i++)
 		{
 			VcapPojo pojo = pojos[i];

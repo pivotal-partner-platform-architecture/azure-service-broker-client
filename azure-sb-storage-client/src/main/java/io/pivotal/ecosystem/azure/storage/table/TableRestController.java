@@ -17,6 +17,8 @@
 
 package io.pivotal.ecosystem.azure.storage.table;
 
+import io.pivotal.ecosystem.azure.autoconfigure.AzureStorageAutoConfiguration.CloudStorageAccountFactory;
+
 import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +43,9 @@ public class TableRestController
 
 	@Autowired
 	private CloudStorageAccount account;
+	
+	@Autowired
+	private CloudStorageAccountFactory factory;
 
 	@RequestMapping(value = "/table", method = RequestMethod.GET)
 	public String processTable(HttpServletResponse response)
@@ -51,6 +56,16 @@ public class TableRestController
 		try
 		{
 			result.append("Connecting to storage account..." + CR);
+			if (account == null)
+			{
+				account = factory.createAccountByServiceInstanceName("mystorage");
+				if (account == null)
+				{
+					String message = "CloudStorageAccount object not injected, lookup by name failed.";
+					LOG.error(message);
+					throw new RuntimeException(message);
+				}
+			}
 
 			// Create the table client.
 			CloudTableClient tableClient = account.createCloudTableClient();

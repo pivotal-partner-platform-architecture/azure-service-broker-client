@@ -17,6 +17,8 @@
 
 package io.pivotal.ecosystem.azure.storage.file;
 
+import io.pivotal.ecosystem.azure.autoconfigure.AzureStorageAutoConfiguration.CloudStorageAccountFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Date;
@@ -45,6 +47,9 @@ public class FileRestController
 
 	@Autowired
 	private CloudStorageAccount account;
+	
+	@Autowired
+	private CloudStorageAccountFactory factory;
 
 	@RequestMapping(value = "/file", method = RequestMethod.GET)
 	public String process(HttpServletResponse response) {
@@ -53,6 +58,17 @@ public class FileRestController
 
 		try {
 			result.append("Connecting to storage account..." + CR);
+			if (account == null)
+			{
+				account = factory.createAccountByServiceInstanceName("mystorage");
+				if (account == null)
+				{
+					String message = "CloudStorageAccount object not injected, lookup by name failed.";
+					LOG.error(message);
+					throw new RuntimeException(message);
+				}
+			}
+
 			result.append("Creating file client..." + CR);
 			CloudFileClient fileClient = account.createCloudFileClient();
 			

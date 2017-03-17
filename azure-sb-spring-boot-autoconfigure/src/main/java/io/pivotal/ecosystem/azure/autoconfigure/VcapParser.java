@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 public class VcapParser
 {
 	public static final String VCAP_SERVICES = "VCAP_SERVICES";
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(VcapParser.class);
 
 	private static final String AZURE = "azure-";
@@ -47,8 +47,10 @@ public class VcapParser
 	private static final String TAGS = "tags";
 	private static final String VOLUME_MOUNTS = "volume_mounts";
 
-	public VcapPojo[] parse(String vcapServices)
+	public VcapResult parse(String vcapServices)
 	{
+		VcapResult result = new VcapResult();
+
 		List<VcapPojo> results = new ArrayList<VcapPojo>();
 
 		LOG.debug("vcapServices = " + vcapServices);
@@ -66,8 +68,14 @@ public class VcapParser
 					if (name.startsWith(AZURE))
 					{
 						JSONArray azureService = json.getJSONArray(name);
-						VcapPojo result = parseService(name, azureService, vcapServices);
-						results.add(result);
+
+						int numElements = azureService.length();
+						LOG.debug("numElements = " + numElements);
+						for (int index = 0; index < numElements; index++)
+						{
+							VcapPojo pojo = parseService(name, azureService, vcapServices, index);
+							results.add(pojo);
+						}
 					}
 				}
 			} catch (JSONException e)
@@ -75,40 +83,37 @@ public class VcapParser
 				LOG.error("Error parsing " + vcapServices, e);
 			}
 		}
-		return results.toArray(new VcapPojo[results.size()]);
+
+		result.setPojos(results.toArray(new VcapPojo[results.size()]));
+		return result;
 	}
 
-	private VcapPojo parseService(String serviceBrokerName, JSONArray azureService, String vCapServices)
+	private VcapPojo parseService(String serviceBrokerName, JSONArray azureService, String vCapServices, int index)
 	{
 		LOG.debug("Parsing serviceBrokerName " + serviceBrokerName);
 
 		VcapPojo result = new VcapPojo();
 		result.setServiceBrokerName(serviceBrokerName);
 
-		int numElements = azureService.length();
-		LOG.debug("numElements = " + numElements);
-		for (int i = 0; i < numElements; i++)
+		try
 		{
-			try
-			{
-				JSONObject service = azureService.getJSONObject(i);
-				result.setLabel(parseString(service, LABEL));
-				result.setProvider(parseString(service, PROVIDER));
-				result.setServiceInstanceName(parseString(service, NAME));
-				result.setServicePlan(parseString(service, PLAN));
-				result.setSyslogDrainUrl(parseString(service, SYSLOG_DRAIN_URL));
-				result.setTags(parseStringArray(service.getJSONArray(TAGS)));
-				result.setVolumeMounts(parseStringArray(service.getJSONArray(VOLUME_MOUNTS)));
+			JSONObject service = azureService.getJSONObject(index);
+			result.setLabel(parseString(service, LABEL));
+			result.setProvider(parseString(service, PROVIDER));
+			result.setServiceInstanceName(parseString(service, NAME));
+			result.setServicePlan(parseString(service, PLAN));
+			result.setSyslogDrainUrl(parseString(service, SYSLOG_DRAIN_URL));
+			result.setTags(parseStringArray(service.getJSONArray(TAGS)));
+			result.setVolumeMounts(parseStringArray(service.getJSONArray(VOLUME_MOUNTS)));
 
-				JSONObject credObject = service.getJSONObject(CREDENTIALS);
-				if (credObject != null)
-				{
-					parseMap(credObject, result.getCredentials());
-				}
-			} catch (JSONException e)
+			JSONObject credObject = service.getJSONObject(CREDENTIALS);
+			if (credObject != null)
 			{
-				LOG.error("Found " + serviceBrokerName + ", but missing " + CREDENTIALS + " : " + vCapServices, e);
+				parseMap(credObject, result.getCredentials());
 			}
+		} catch (JSONException e)
+		{
+			LOG.error("Found " + serviceBrokerName + ", but missing " + CREDENTIALS + " : " + vCapServices, e);
 		}
 		return result;
 	}
@@ -141,22 +146,20 @@ public class VcapParser
 				String key = (String) keys.get(i);
 				String value = mapObject.getString(key);
 				target.put(key, value);
-			} 
-			catch (JSONException e)
+			} catch (JSONException e)
 			{
 				LOG.error("Error parsing " + mapObject, e);
 			}
 		}
-		LOG.debug(mapObject.names().toString());
 	}
-	
+
 	private String parseString(JSONObject service, String key)
 	{
 		String result = null;
-		
+
 		try
 		{
-			if (! service.isNull(key))
+			if (!service.isNull(key))
 			{
 				result = service.getString(key);
 			}

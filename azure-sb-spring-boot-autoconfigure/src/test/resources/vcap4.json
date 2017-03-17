@@ -1,0 +1,39 @@
+{
+  "azure-storage": [
+   {
+    "credentials": {
+     "primary_access_key": "primarykey",
+     "secondary_access_key": "secondarykey",
+     "storage_account_name": "mystorage"
+    },
+    "label": "azure-storage",
+    "name": "mystorage",
+    "plan": "standard",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": [
+     "Azure",
+     "Storage"
+    ],
+    "volume_mounts": []
+   },
+   {
+    "credentials": {
+     "primary_access_key": "primarykey",
+     "secondary_access_key": "secondarykey",
+     "storage_account_name": "mystorage2"
+    },
+    "label": "azure-storage",
+    "name": "mystorage2",
+    "plan": "standard",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": [
+     "Azure",
+     "Storage"
+    ],
+    "volume_mounts": []
+   }
+  ]
+ }
+ 

@@ -53,7 +53,8 @@ public class VcapParserTest
 		try
 		{
 			content = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-			VcapPojo[] pojos = parser.parse(content);
+			VcapResult result = parser.parse(content); 
+			VcapPojo[] pojos = result.getPojos();
 			assertNotNull(pojos);
 			assertEquals(1, pojos.length);
 			VcapPojo pojo = pojos[0];
@@ -81,8 +82,6 @@ public class VcapParserTest
 		{
 			LOG.error("Error reading json file", e);
 		}
-		
-
 	}
 	
 	@Test
@@ -93,7 +92,8 @@ public class VcapParserTest
 		try
 		{
 			content = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-			VcapPojo[] pojos = parser.parse(content);
+			VcapResult result = parser.parse(content); 
+			VcapPojo[] pojos = result.getPojos();
 			assertNotNull(pojos);
 			assertEquals(1, pojos.length);
 			VcapPojo pojo = pojos[0];
@@ -118,8 +118,92 @@ public class VcapParserTest
 		{
 			LOG.error("Error reading json file", e);
 		}
-		
+	}
 
+	@Test
+	public void testVcapTwoServicesWithNulls()
+	{
+		Resource resource = new ClassPathResource("/vcap3.json");
+		String content;
+		try
+		{
+			content = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+			VcapResult result = parser.parse(content); 
+			VcapPojo[] pojos = result.getPojos();
+			assertNotNull(pojos);
+			assertEquals(2, pojos.length);
+			VcapPojo pojo = result.findByServiceType(VcapServiceType.AZURE_REDISCACHE);
+			assertNotNull(pojo);
+			
+			LOG.debug("pojo = " + pojo);
+			assertEquals(6, pojo.getCredentials().size());
+			assertEquals(0, pojo.getTags().length);
+			assertEquals(0, pojo.getVolumeMounts().length);
+			assertEquals("azure-rediscache", pojo.getLabel());
+			assertNull(pojo.getProvider());
+			assertEquals("azure-rediscache", pojo.getServiceBrokerName());
+			assertEquals("myredis", pojo.getServiceInstanceName());
+			assertEquals("basic", pojo.getServicePlan());
+			assertNull(pojo.getSyslogDrainUrl());
+			assertEquals("hostname", pojo.getCredentials().get("hostname"));
+			assertEquals("username", pojo.getCredentials().get("name"));
+			assertEquals("6379", pojo.getCredentials().get("port"));
+			assertEquals("DIK5TNeN6qFhrF6ATpxLLIZ7SpNMDg9xU+0123456789", pojo.getCredentials().get("primaryKey"));
+			assertEquals("nP/eeEyCo2c11UP1g4D5KgZgQN8bfR6clM0123456789=", pojo.getCredentials().get("secondaryKey"));
+			assertEquals("6380", pojo.getCredentials().get("sslPort"));
+
+			pojo = result.findByServiceType(VcapServiceType.AZURE_STORAGE);
+			assertNotNull(pojo);
+			
+			LOG.debug("pojo = " + pojo);
+			assertEquals(3, pojo.getCredentials().size());
+			assertEquals(2, pojo.getTags().length);
+			assertEquals(0, pojo.getVolumeMounts().length);
+			assertEquals("azure-storage", pojo.getLabel());
+			assertNull(pojo.getProvider());
+			assertEquals("azure-storage", pojo.getServiceBrokerName());
+			assertEquals("mystorage", pojo.getServiceInstanceName());
+			assertEquals("standard", pojo.getServicePlan());
+			assertNull(pojo.getSyslogDrainUrl());
+			assertEquals("Azure", pojo.getTags()[0]);
+			assertEquals("Storage", pojo.getTags()[1]);
+			assertEquals("Vrpr5RGe7lf9FgNNmsrzYY9N8PUB1USAJLbDE2oytjD+3bUJXjt0H6Uwu+wGaQ+icyakQLNI8g8t0123456789==", pojo.getCredentials().get("primary_access_key"));
+			assertEquals("7Dp5E253piI0rsfx1EIsSpw2ZQaJVe5uq56+OyEnom3wgC7DQs2jVbEwIL+90a7+u5xdLOzxxy0d0123456789==", pojo.getCredentials().get("secondary_access_key"));
+			assertEquals("storage", pojo.getCredentials().get("storage_account_name"));
+		} 
+		catch (IOException e)
+		{
+			LOG.error("Error reading json file", e);
+		}
+	}
+
+	@Test
+	public void testVcapTwoServicesSameServiceType()
+	{
+		Resource resource = new ClassPathResource("/vcap4.json");
+		String content;
+		try
+		{
+			content = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+			VcapResult result = parser.parse(content); 
+			VcapPojo[] pojos = result.getPojos();
+			assertNotNull(pojos);
+			assertEquals(2, pojos.length);
+			int matches = result.findCountByServiceType(VcapServiceType.AZURE_STORAGE);
+			assertEquals(2, matches);
+			
+			VcapPojo pojo = result.findByServiceTypeAndServiceInstanceName(VcapServiceType.AZURE_STORAGE, "mystorage");
+			LOG.debug("pojo = " + pojo);
+			assertNotNull(pojo);
+			
+			pojo = result.findByServiceTypeAndServiceInstanceName(VcapServiceType.AZURE_STORAGE, "mystorage2");
+			LOG.debug("pojo = " + pojo);
+			assertNotNull(pojo);
+		} 
+		catch (IOException e)
+		{
+			LOG.error("Error reading json file", e);
+		}
 	}
 
 }
