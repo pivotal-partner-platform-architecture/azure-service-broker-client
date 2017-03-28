@@ -21,7 +21,6 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 
@@ -34,21 +33,15 @@ import org.springframework.core.env.Environment;
  *         azure-sb-documentdb-client project's application.properties
  */
 @ConfigurationProperties("azure.documentdb")
-public class AzureDocumentDBProperties
+public class AzureDocumentDBProperties extends BaseAzureProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureDocumentDBProperties.class);
 
-	private static final String DOCUMENTDB_SERVICE = "azure-documentdb";
+	private static final VcapServiceType SERVICE_TYPE = VcapServiceType.AZURE_DOCUMENTDB;
 	private static final String HOST_ENDPOINT = "documentdb_host_endpoint";
 	private static final String MASTER_KEY = "documentdb_master_key";
 	private static final String DATABASE_ID = "documentdb_database_id";
 	private static final String DATABASE_LINK = "documentdb_database_link";
-
-	@Autowired
-	private VcapParser parser;
-
-	@Autowired
-	private Environment environment;
 
 	private String resourceId = "myresource";
 
@@ -61,25 +54,30 @@ public class AzureDocumentDBProperties
 	private String databaseId = "TBD";
 	private String link = "TBD";
 
+	public AzureDocumentDBProperties(Environment environment, VcapParser parser)
+	{
+		super(environment, parser);
+	}
+
 	@PostConstruct
 	private void populateProperties()
 	{
-		String vcapServices = environment.getProperty(VcapParser.VCAP_SERVICES);
-		VcapResult result = parser.parse(vcapServices); 
-		VcapPojo[] pojos = result.getPojos();
-		for (int i = 0; i < pojos.length; i++)
-		{
-			VcapPojo pojo = pojos[i];
-			if (DOCUMENTDB_SERVICE.equals(pojo.getServiceBrokerName()))
-			{
-				LOG.debug("Found the documentdb key");
-				hostEndpoint = pojo.getCredentials().get(HOST_ENDPOINT);
-				masterKey = pojo.getCredentials().get(MASTER_KEY);
-				databaseId = pojo.getCredentials().get(DATABASE_ID);
-				link = pojo.getCredentials().get(DATABASE_LINK);
-			}
-		}
+		populateProperties(SERVICE_TYPE);
 		LOG.debug("INSIDE populateProperties");
+	}
+
+	public void populatePropertiesForServiceInstance(String serviceInstanceName)
+	{
+		populatePropertiesForServiceInstance(SERVICE_TYPE, serviceInstanceName);
+	}
+
+	@Override
+	protected void populateProperties(VcapPojo pojo)
+	{
+		hostEndpoint = pojo.getCredentials().get(HOST_ENDPOINT);
+		masterKey = pojo.getCredentials().get(MASTER_KEY);
+		databaseId = pojo.getCredentials().get(DATABASE_ID);
+		link = pojo.getCredentials().get(DATABASE_LINK);
 	}
 
 	public String getResourceId()
@@ -135,7 +133,7 @@ public class AzureDocumentDBProperties
 	@Override
 	public String toString()
 	{
-		return "AzureDocumentDBProperties [parser=" + parser + ", environment=" + environment + ", resourceId=" + resourceId
+		return "AzureDocumentDBProperties [resourceId=" + resourceId
 				+ ", hostEndpoint=" + hostEndpoint + ", masterKey=" + masterKey + ", databaseId=" + databaseId + ", link=" + link + "]";
 	}
 

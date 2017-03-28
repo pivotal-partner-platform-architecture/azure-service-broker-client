@@ -20,7 +20,7 @@ package io.pivotal.ecosystem.azure.autoconfigure;
 public enum VcapServiceType
 {
 	AZURE_REDISCACHE("azure-rediscache"), AZURE_DOCUMENTDB("azure-documentdb"), AZURE_STORAGE("azure-storage"),
-	AZURE_SQLDB("azure-sqldb");
+	AZURE_SQLDB("azure-sqldb"), AZURE_SERVICEBUS("azure-servicebus");
 
 	private String text;
 

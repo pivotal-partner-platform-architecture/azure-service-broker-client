@@ -48,6 +48,29 @@ public class AzureServiceBusAutoConfiguration
 	public ServiceBusContract serviceBusContract()
 	{
 		LOG.debug("serviceBusContract start...");
+		return createServiceBusContract();
+	}
+	
+	@Bean
+	@Profile("!testing")
+	public ServiceBusContractFactory serviceBusContractFactory()
+	{
+		return new ServiceBusContractFactory();
+	}
+	
+	public class ServiceBusContractFactory
+	{
+		public ServiceBusContract createContractByServiceInstanceName(String serviceInstanceName)
+		{
+			LOG.debug("creating ServiceBusContract for serviceInstanceName = " + serviceInstanceName);
+			properties.populatePropertiesForServiceInstance(serviceInstanceName);
+			return createServiceBusContract();
+		}
+	}
+	
+	private ServiceBusContract createServiceBusContract()
+	{
+		LOG.debug("createServiceBusContract start...");
 		ServiceBusContract service = null;
 		
 		if (! TBD.equals(properties.getNamespaceName()))

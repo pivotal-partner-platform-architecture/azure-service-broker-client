@@ -64,12 +64,8 @@ public class AzureStorageAutoConfiguration
 		public CloudStorageAccount createAccountByServiceInstanceName(String serviceInstanceName)
 		{
 			LOG.debug("creating CloudStorageAccount for serviceInstanceName = " + serviceInstanceName);
-			
 			properties.populatePropertiesForServiceInstance(serviceInstanceName);
-			
-			CloudStorageAccount account = createCloudStorageAccount();
-			LOG.debug("created account " + account);
-			return account;
+			return createCloudStorageAccount();
 		}
 	}
 	

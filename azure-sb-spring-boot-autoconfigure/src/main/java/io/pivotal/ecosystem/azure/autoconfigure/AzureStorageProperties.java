@@ -21,68 +21,45 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 
 @ConfigurationProperties("azure.storage.account")
-public class AzureStorageProperties 
+public class AzureStorageProperties extends BaseAzureProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureStorageProperties.class);
 
-	private static final String AZURE_STORAGE = "azure-storage";
+	private static final VcapServiceType SERVICE_TYPE = VcapServiceType.AZURE_STORAGE;
 	private static final String TBD = "TBD";
 	private static final String STORAGE_ACCOUNT_NAME = "storage_account_name";
 	private static final String PRIMARY_ACCESS_KEY = "primary_access_key";
 	
-	@Autowired
-	private VcapParser parser;
-
-	@Autowired
-	private Environment environment;
-	
 	private String name = TBD;
 	private String key = TBD;
-
-	private VcapResult result;
 	
+	public AzureStorageProperties(Environment environment, VcapParser parser)
+	{
+		super(environment, parser);
+	}
+
 	@PostConstruct
 	private void populateProperties()
 	{
-		String vcapServices = environment.getProperty(VcapParser.VCAP_SERVICES);
-		result = parser.parse(vcapServices); 
-		switch  (result.findCountByServiceType(VcapServiceType.AZURE_STORAGE))
-		{
-		case 0:
-			LOG.info("No services of type " + VcapServiceType.AZURE_STORAGE.toString() + " found.");
-			break;
-		case 1:
-			LOG.info("One services of type " + VcapServiceType.AZURE_STORAGE.toString() + " found.");
-			VcapPojo pojo = result.findByServiceType(VcapServiceType.AZURE_STORAGE);
-			if (pojo != null)
-			{
-				LOG.debug("Found the storage key");
-				name = pojo.getCredentials().get(STORAGE_ACCOUNT_NAME);
-				key = pojo.getCredentials().get(PRIMARY_ACCESS_KEY);
-			}
-			break;
-		default:
-			LOG.warn("More than one service of type " + VcapServiceType.AZURE_STORAGE.toString() + " found, cannot autoconfigure service, must use factory instead.");
-			break;
-		}
+		populateProperties(SERVICE_TYPE);
 	}
 
 	public void populatePropertiesForServiceInstance(String serviceInstanceName)
 	{
-		VcapPojo pojo = result.findByServiceTypeAndServiceInstanceName(VcapServiceType.AZURE_STORAGE, serviceInstanceName);
-		if (pojo != null)
-		{
-			LOG.debug("Found the storage key for service instance name " + serviceInstanceName);
-			name = pojo.getCredentials().get(STORAGE_ACCOUNT_NAME);
-			key = pojo.getCredentials().get(PRIMARY_ACCESS_KEY);
-		}
+		populatePropertiesForServiceInstance(SERVICE_TYPE, serviceInstanceName);
 	}
-	
+
+	@Override
+	protected void populateProperties(VcapPojo pojo)
+	{
+		name = pojo.getCredentials().get(STORAGE_ACCOUNT_NAME);
+		key = pojo.getCredentials().get(PRIMARY_ACCESS_KEY);
+	}
+
 	public String getName() {
 		return name;
 	}

@@ -44,7 +44,30 @@ public class AzureRedisAutoConfiguration
 
 	@Bean
 	@Profile("!testing")
-	public RedisConnectionFactory redisConnectionFactory() {
+	public RedisConnectionFactory redisConnectionFactory() 
+	{
+		return createRedisConnectionFactory();
+	}
+
+	@Bean
+	@Profile("!testing")
+	public RedisConnectionFactoryFactory createRedisConnectionFactoryFactory() 
+	{
+		return new RedisConnectionFactoryFactory();
+	}
+
+	public class RedisConnectionFactoryFactory
+	{
+		public RedisConnectionFactory createRedisFactoryByServiceInstanceName(String serviceInstanceName)
+		{
+			LOG.debug("creating RedisConnectionFactory for serviceInstanceName = " + serviceInstanceName);
+			properties.populatePropertiesForServiceInstance(serviceInstanceName);
+			return createRedisConnectionFactory();
+		}
+	}
+	
+	private RedisConnectionFactory createRedisConnectionFactory() 
+	{
 		LOG.info("Hostname = " + properties.getHostname());
 		JedisConnectionFactory cf = null;
 		if (! TBD.equals(properties.getHostname()))
@@ -67,5 +90,4 @@ public class AzureRedisAutoConfiguration
 		}
 		return cf;
 	}
-
 }

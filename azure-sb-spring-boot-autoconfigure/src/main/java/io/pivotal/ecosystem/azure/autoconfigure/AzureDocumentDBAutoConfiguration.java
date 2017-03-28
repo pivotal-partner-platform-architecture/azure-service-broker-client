@@ -17,6 +17,8 @@
 
 package io.pivotal.ecosystem.azure.autoconfigure;
 
+import io.pivotal.ecosystem.azure.autoconfigure.AzureStorageAutoConfiguration.CloudStorageAccountFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ import org.springframework.context.annotation.Profile;
 import com.microsoft.azure.documentdb.ConnectionPolicy;
 import com.microsoft.azure.documentdb.ConsistencyLevel;
 import com.microsoft.azure.documentdb.DocumentClient;
+import com.microsoft.azure.storage.CloudStorageAccount;
 
 /**
  * 
@@ -52,6 +55,28 @@ public class AzureDocumentDBAutoConfiguration
 	@Bean
 	@Profile("!testing")
 	public DocumentClient documentClient() {
+		return createDdocumentClient();
+	}
+
+	@Bean
+	@Profile("!testing")
+	public DocumentClientFactory documentClientFactory()
+	{
+		return new DocumentClientFactory();
+	}
+
+	public class DocumentClientFactory
+	{
+		public DocumentClient createClientByServiceInstanceName(String serviceInstanceName)
+		{
+			LOG.debug("creating DocumentClient for serviceInstanceName = " + serviceInstanceName);
+			properties.populatePropertiesForServiceInstance(serviceInstanceName);
+			return createDdocumentClient();
+		}
+	}
+	
+	private DocumentClient createDdocumentClient() 
+	{
 		String hostname = properties.getHostEndpoint();
 		String masterkey = properties.getMasterKey();
 		LOG.debug("hostname = " + hostname);

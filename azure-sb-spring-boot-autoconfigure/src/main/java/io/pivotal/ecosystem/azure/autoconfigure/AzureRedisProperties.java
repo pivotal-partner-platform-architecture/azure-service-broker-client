@@ -19,50 +19,43 @@ package io.pivotal.ecosystem.azure.autoconfigure;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 
 @ConfigurationProperties("azure.redis")
-public class AzureRedisProperties
+public class AzureRedisProperties extends BaseAzureProperties
 {
-	private static final Logger LOG = LoggerFactory.getLogger(AzureRedisProperties.class);
-
-	private static final String AZURE_REDISCACHE = "azure-rediscache";
+	private static final VcapServiceType SERVICE_TYPE = VcapServiceType.AZURE_REDISCACHE;
 	private static final String HOST_NAME = "hostname";
 	private static final String SSL_PORT = "sslPort";
 	private static final String PRIMARY_KEY = "primaryKey";
 
-	@Autowired
-	private VcapParser parser;
-
-	@Autowired
-	private Environment environment;
-	
 	private String hostname = "TBD";
 	private String sslPort = "TBD";
 	private String primaryKey = "TBD";
-
+	
+	public AzureRedisProperties(Environment environment, VcapParser parser)
+	{
+		super(environment, parser);
+	}
+	
 	@PostConstruct
 	private void populateProperties()
 	{
-		String vcapServices = environment.getProperty(VcapParser.VCAP_SERVICES);
-		VcapResult result = parser.parse(vcapServices); 
-		VcapPojo[] pojos = result.getPojos();
+		populateProperties(SERVICE_TYPE);
+	}
 
-		for (int i=0; i<pojos.length; i++)
-		{
-			VcapPojo pojo = pojos[i];
-			if (AZURE_REDISCACHE.equals(pojo.getServiceBrokerName()))
-			{
-				LOG.debug("Found the redis cache key");
-				hostname = pojo.getCredentials().get(HOST_NAME);
-				sslPort = pojo.getCredentials().get(SSL_PORT);
-				primaryKey = pojo.getCredentials().get(PRIMARY_KEY);
-			}
-		}
+	public void populatePropertiesForServiceInstance(String serviceInstanceName)
+	{
+		populatePropertiesForServiceInstance(SERVICE_TYPE, serviceInstanceName);
+	}
+	
+	@Override
+	protected void populateProperties(VcapPojo pojo)
+	{
+		hostname = pojo.getCredentials().get(HOST_NAME);
+		sslPort = pojo.getCredentials().get(SSL_PORT);
+		primaryKey = pojo.getCredentials().get(PRIMARY_KEY);
 	}
 
 	public String getHostname()
@@ -98,7 +91,7 @@ public class AzureRedisProperties
 	@Override
 	public String toString()
 	{
-		return "AzureRedisProperties [parser=" + parser + ", environment=" + environment + ", hostname=" + hostname + ", sslPort="
+		return "AzureRedisProperties [hostname=" + hostname + ", sslPort="
 				+ sslPort + ", primaryKey=" + primaryKey + "]";
 	}
 
