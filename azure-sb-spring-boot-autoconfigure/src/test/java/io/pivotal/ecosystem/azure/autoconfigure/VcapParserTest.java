@@ -17,7 +17,9 @@
 
 package io.pivotal.ecosystem.azure.autoconfigure;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,15 +30,14 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
-
+@ContextConfiguration(classes={VcapParser.class})
 @ActiveProfiles( profiles = "testing" )
 public class VcapParserTest
 {
@@ -132,7 +133,7 @@ public class VcapParserTest
 			VcapPojo[] pojos = result.getPojos();
 			assertNotNull(pojos);
 			assertEquals(2, pojos.length);
-			VcapPojo pojo = result.findByServiceType(VcapServiceType.AZURE_REDISCACHE);
+			VcapPojo pojo = result.findPojoForServiceType(VcapServiceType.AZURE_REDISCACHE);
 			assertNotNull(pojo);
 			
 			LOG.debug("pojo = " + pojo);
@@ -152,7 +153,7 @@ public class VcapParserTest
 			assertEquals("nP/eeEyCo2c11UP1g4D5KgZgQN8bfR6clM0123456789=", pojo.getCredentials().get("secondaryKey"));
 			assertEquals("6380", pojo.getCredentials().get("sslPort"));
 
-			pojo = result.findByServiceType(VcapServiceType.AZURE_STORAGE);
+			pojo = result.findPojoForServiceType(VcapServiceType.AZURE_STORAGE);
 			assertNotNull(pojo);
 			
 			LOG.debug("pojo = " + pojo);
@@ -192,11 +193,11 @@ public class VcapParserTest
 			int matches = result.findCountByServiceType(VcapServiceType.AZURE_STORAGE);
 			assertEquals(2, matches);
 			
-			VcapPojo pojo = result.findByServiceTypeAndServiceInstanceName(VcapServiceType.AZURE_STORAGE, "mystorage");
+			VcapPojo pojo = result.findPojoForServiceTypeAndServiceInstanceName(VcapServiceType.AZURE_STORAGE, "mystorage");
 			LOG.debug("pojo = " + pojo);
 			assertNotNull(pojo);
 			
-			pojo = result.findByServiceTypeAndServiceInstanceName(VcapServiceType.AZURE_STORAGE, "mystorage2");
+			pojo = result.findPojoForServiceTypeAndServiceInstanceName(VcapServiceType.AZURE_STORAGE, "mystorage2");
 			LOG.debug("pojo = " + pojo);
 			assertNotNull(pojo);
 		} 

@@ -17,21 +17,16 @@
 
 package io.pivotal.ecosystem.azure.autoconfigure;
 
-import io.pivotal.ecosystem.azure.autoconfigure.AzureStorageAutoConfiguration.CloudStorageAccountFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 import com.microsoft.azure.documentdb.ConnectionPolicy;
 import com.microsoft.azure.documentdb.ConsistencyLevel;
 import com.microsoft.azure.documentdb.DocumentClient;
-import com.microsoft.azure.storage.CloudStorageAccount;
 
 /**
  * 
@@ -47,19 +42,16 @@ public class AzureDocumentDBAutoConfiguration
 
 	private final AzureDocumentDBProperties properties;
 
-	@Autowired
 	public AzureDocumentDBAutoConfiguration(AzureDocumentDBProperties properties) {
 		this.properties = properties;
 	}
 
 	@Bean
-	@Profile("!testing")
 	public DocumentClient documentClient() {
-		return createDdocumentClient();
+		return createDocumentClient();
 	}
 
 	@Bean
-	@Profile("!testing")
 	public DocumentClientFactory documentClientFactory()
 	{
 		return new DocumentClientFactory();
@@ -67,22 +59,24 @@ public class AzureDocumentDBAutoConfiguration
 
 	public class DocumentClientFactory
 	{
-		public DocumentClient createClientByServiceInstanceName(String serviceInstanceName)
+		public DocumentClient createClientByServiceInstanceName(String serviceInstanceName) throws ServiceInstanceNotFoundException
 		{
 			LOG.debug("creating DocumentClient for serviceInstanceName = " + serviceInstanceName);
-			properties.populatePropertiesForServiceInstance(serviceInstanceName);
-			return createDdocumentClient();
+			properties.populateDocumentDBPropertiesForServiceInstance(serviceInstanceName);
+			return createDocumentClient();
 		}
 	}
 	
-	private DocumentClient createDdocumentClient() 
+	private DocumentClient createDocumentClient() 
 	{
-		String hostname = properties.getHostEndpoint();
-		String masterkey = properties.getMasterKey();
-		LOG.debug("hostname = " + hostname);
-		LOG.debug("masterkey = " + masterkey);
-		return new DocumentClient(hostname, masterkey,
-				ConnectionPolicy.GetDefault(), ConsistencyLevel.Session);
+		LOG.debug("createDocumentClient: hostname = " + properties.getHostEndpoint() + ", masterkey = " + properties.getMasterKey());
+		
+		DocumentClient client = null;
+		if (properties.getHostEndpoint() != null && properties.getMasterKey() != null)
+		{
+			client = new DocumentClient(properties.getHostEndpoint(), properties.getMasterKey(), ConnectionPolicy.GetDefault(), ConsistencyLevel.Session);
+		}
+		return client;
 	}
 
 }

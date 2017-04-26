@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 import com.microsoft.azure.storage.CloudStorageAccount;
 
@@ -36,7 +35,6 @@ import com.microsoft.azure.storage.CloudStorageAccount;
 public class AzureStorageAutoConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureStorageAutoConfiguration.class);
-	private static final String TBD = "TBD";
 
 	private final AzureStorageProperties properties;
 
@@ -45,7 +43,6 @@ public class AzureStorageAutoConfiguration
 	}
 
 	@Bean
-	@Profile("!testing")
 	public CloudStorageAccount cloudStorageAccount()
 	{
 		LOG.debug("cloudStorageAccount called, account name = " + properties.getName());
@@ -53,7 +50,6 @@ public class AzureStorageAutoConfiguration
 	}
 	
 	@Bean
-	@Profile("!testing")
 	public CloudStorageAccountFactory cloudStorageAccountFactory()
 	{
 		return new CloudStorageAccountFactory();
@@ -61,20 +57,20 @@ public class AzureStorageAutoConfiguration
 	
 	public class CloudStorageAccountFactory
 	{
-		public CloudStorageAccount createAccountByServiceInstanceName(String serviceInstanceName)
+		public CloudStorageAccount createAccountByServiceInstanceName(String serviceInstanceName) throws ServiceInstanceNotFoundException, AzureServiceException
 		{
 			LOG.debug("creating CloudStorageAccount for serviceInstanceName = " + serviceInstanceName);
-			properties.populatePropertiesForServiceInstance(serviceInstanceName);
+			properties.populateStoragePropertiesForServiceInstance(serviceInstanceName);
 			return createCloudStorageAccount();
 		}
 	}
 	
-	private CloudStorageAccount createCloudStorageAccount()
+	private CloudStorageAccount createCloudStorageAccount() 
 	{
 		LOG.debug("createCloudStorageAccount called, account name = " + properties.getName());
 		
 		CloudStorageAccount account = null;
-		if (! TBD.equals(properties.getName()))
+		if (properties.getName() !=  null)
 		{
 			try
 			{
@@ -84,10 +80,14 @@ public class AzureStorageAutoConfiguration
 				LOG.debug("createCloudStorageAccount created account " + account);
 			} catch (InvalidKeyException e)
 			{
-				LOG.error("Error creating createCloudStorageAccount", e);
+				String msg = "Error creating CloudStorageAccount: " + e.getMessage();
+				LOG.error(msg, e);
+				throw new AzureServiceException(msg, e);
 			} catch (URISyntaxException e)
 			{
-				LOG.error("Error creating createCloudStorageAccount", e);
+				String msg = "Error creating CloudStorageAccount: " + e.getMessage();
+				LOG.error(msg, e);
+				throw new AzureServiceException(msg, e);
 			}
 		}
 		return account;

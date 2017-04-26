@@ -17,17 +17,27 @@
 
 package io.pivotal.ecosystem.azure.autoconfigure;
 
-abstract public class BaseAzureProperties
+public class ServiceInstanceNotFoundException extends RuntimeException
 {
-	private VcapResult result;
-
-	public VcapResult getResult()
+	private static final long serialVersionUID = 1L;
+	private String serviceInstanceName;
+	private VcapServiceType serviceType;
+	
+	public ServiceInstanceNotFoundException(String msg, VcapServiceType type, String serviceInstance)
 	{
-		return result;
+		super(msg);
+		this.serviceInstanceName = serviceInstance;
+		this.serviceType = type;
 	}
 
-	public void setResult(VcapResult result)
+	public String getServiceInstanceName()
 	{
-		this.result = result;
+		return serviceInstanceName;
 	}
+
+	public VcapServiceType getServiceType()
+	{
+		return serviceType;
+	}
+
 }

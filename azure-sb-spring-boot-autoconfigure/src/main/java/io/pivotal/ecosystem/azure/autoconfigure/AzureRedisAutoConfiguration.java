@@ -23,7 +23,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 
@@ -33,24 +32,20 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 public class AzureRedisAutoConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureRedisAutoConfiguration.class);
-	private static final String TBD = "TBD";
 
 	public final AzureRedisProperties properties;
 
 	public AzureRedisAutoConfiguration(AzureRedisProperties properties) {
-		LOG.info("Constructor...");
 		this.properties = properties;
 	}
 
 	@Bean
-	@Profile("!testing")
 	public RedisConnectionFactory redisConnectionFactory() 
 	{
 		return createRedisConnectionFactory();
 	}
 
 	@Bean
-	@Profile("!testing")
 	public RedisConnectionFactoryFactory createRedisConnectionFactoryFactory() 
 	{
 		return new RedisConnectionFactoryFactory();
@@ -58,10 +53,10 @@ public class AzureRedisAutoConfiguration
 
 	public class RedisConnectionFactoryFactory
 	{
-		public RedisConnectionFactory createRedisFactoryByServiceInstanceName(String serviceInstanceName)
+		public RedisConnectionFactory createRedisFactoryByServiceInstanceName(String serviceInstanceName) throws ServiceInstanceNotFoundException, AzureServiceException
 		{
 			LOG.debug("creating RedisConnectionFactory for serviceInstanceName = " + serviceInstanceName);
-			properties.populatePropertiesForServiceInstance(serviceInstanceName);
+			properties.populateRedisPropertiesForServiceInstance(serviceInstanceName);
 			return createRedisConnectionFactory();
 		}
 	}
@@ -70,7 +65,7 @@ public class AzureRedisAutoConfiguration
 	{
 		LOG.info("Hostname = " + properties.getHostname());
 		JedisConnectionFactory cf = null;
-		if (! TBD.equals(properties.getHostname()))
+		if (properties.getHostname() != null)
 		{
 			LOG.info("Creating JedisConnectionFactory...");
 			try
@@ -85,7 +80,9 @@ public class AzureRedisAutoConfiguration
 			}
 			catch (NoClassDefFoundError e)
 			{
-				LOG.error("Required Redis classes not in classpath!", e);
+				String msg = "Required Redis classes not in classpath! " + e.getMessage();
+				LOG.error(msg, e);
+				throw new AzureServiceException(msg, e);
 			}
 		}
 		return cf;

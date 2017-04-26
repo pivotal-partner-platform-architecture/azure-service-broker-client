@@ -1,6 +1,6 @@
+org.springframework.boot.env.EnvironmentPostProcessor=io.pivotal.ecosystem.azure.autoconfigure.VcapParser
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 io.pivotal.ecosystem.azure.autoconfigure.AzureRedisAutoConfiguration,\
 io.pivotal.ecosystem.azure.autoconfigure.AzureServiceBusAutoConfiguration,\
 io.pivotal.ecosystem.azure.autoconfigure.AzureStorageAutoConfiguration,\
-io.pivotal.ecosystem.azure.autoconfigure.AzureDocumentDBAutoConfiguration,\
-io.pivotal.ecosystem.azure.autoconfigure.VcapParser
+io.pivotal.ecosystem.azure.autoconfigure.AzureDocumentDBAutoConfiguration

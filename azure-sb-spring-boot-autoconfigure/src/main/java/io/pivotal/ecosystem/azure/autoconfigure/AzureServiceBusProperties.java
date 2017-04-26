@@ -17,62 +17,21 @@
 
 package io.pivotal.ecosystem.azure.autoconfigure;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.env.Environment;
 
-@ConfigurationProperties("azure.servicebus")
+@ConfigurationProperties(Constants.NAMESPACE_SERVICE_BUS)
 public class AzureServiceBusProperties extends BaseAzureProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureServiceBusProperties.class);
 
-	private static final VcapServiceType SERVICE_TYPE = VcapServiceType.AZURE_SERVICEBUS;
-	private static final String SHARED_ACCESS_NAME = "shared_access_key_name";
-	private static final String SHARED_ACCESS_KEY_VALUE = "shared_access_key_value";
-	private static final String NAMESPACE_NAME = "namespace_name";
 	private static final String AZURE_SERVICE_BUS_DOMAIN = "servicebus.windows.net";
 
-	private String namespaceName = "TBD";
-	private String sharedAccessName = "TBD";
-	private String sharedAccessKeyValue = "TBD";
+	private String namespaceName;
+	private String sharedAccessName;
+	private String sharedAccessKeyValue;
 	
-	public AzureServiceBusProperties(Environment environment, VcapParser parser)
-	{
-		super(environment, parser);
-	}
-	
-	@PostConstruct
-	private void populateProperties()
-	{
-		populateProperties(SERVICE_TYPE);
-	}
-
-	public void populatePropertiesForServiceInstance(String serviceInstanceName)
-	{
-		populatePropertiesForServiceInstance(SERVICE_TYPE, serviceInstanceName);
-	}
-
-	@Override
-	protected void populateProperties(VcapPojo pojo)
-	{
-		namespaceName = pojo.getCredentials().get(NAMESPACE_NAME);
-		sharedAccessName = pojo.getCredentials().get(SHARED_ACCESS_NAME);
-		sharedAccessKeyValue = pojo.getCredentials().get(SHARED_ACCESS_KEY_VALUE);
-	}
-	
-	public String buildServiceBusConnectString()
-	{
-		String connectionString = 
-				  "Endpoint=sb://" + getNamespaceName() + "." + AZURE_SERVICE_BUS_DOMAIN + "/;" 
-				+ "SharedAccessKeyName=" + getSharedAccessName() + ";" 
-				+ "SharedAccessKey=" + getSharedAccessKeyValue();
-		LOG.debug("connectionString name = " + connectionString);
-		return connectionString;
-	}
-
 	public String getNamespaceName()
 	{
 		return namespaceName;
@@ -102,6 +61,37 @@ public class AzureServiceBusProperties extends BaseAzureProperties
 	{
 		this.sharedAccessKeyValue = sharedAccessKeyValue;
 	}
+
+	public void populateServiceBusPropertiesForServiceInstance(String serviceInstanceName) throws ServiceInstanceNotFoundException
+	{
+		LOG.debug("populateServiceBusPropertiesForServiceInstance " + serviceInstanceName);
+		VcapServiceType serviceType = VcapServiceType.AZURE_SERVICEBUS;
+		VcapPojo pojo = getResult().findPojoForServiceTypeAndServiceInstanceName(serviceType, serviceInstanceName);
+		if (pojo != null)
+		{
+			setNamespaceName(pojo.getCredentials().get(Constants.NAMESPACE_NAME));
+			setSharedAccessKeyValue(pojo.getCredentials().get(Constants.SHARED_ACCESS_KEY_VALUE));
+			setSharedAccessName(pojo.getCredentials().get(Constants.SHARED_ACCESS_NAME));
+			LOG.debug("populateServiceBusPropertiesForServiceInstance updated property values. " + getNamespaceName() + ", " + getSharedAccessKeyValue() + ", " + getSharedAccessName());
+		}
+		else
+		{
+			String msg = "populateServiceBusPropertiesForServiceInstance: No pojo found for serviceType " + serviceType + ", serviceInstanceName " + serviceInstanceName;
+			LOG.error(msg);
+			throw new ServiceInstanceNotFoundException(msg, serviceType, serviceInstanceName);
+		}
+	}
+	
+	public String buildServiceBusConnectString()
+	{
+		String connectionString = 
+				  "Endpoint=sb://" + getNamespaceName() + "." + AZURE_SERVICE_BUS_DOMAIN + "/;" 
+				+ "SharedAccessKeyName=" + getSharedAccessName() + ";" 
+				+ "SharedAccessKey=" + getSharedAccessKeyValue();
+		LOG.debug("connectionString name = " + connectionString);
+		return connectionString;
+	}
+
 
 	@Override
 	public String toString()

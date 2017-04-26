@@ -17,77 +17,67 @@
 
 package io.pivotal.ecosystem.azure.autoconfigure;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.env.Environment;
 
-@ConfigurationProperties("azure.storage.account")
+@ConfigurationProperties(Constants.NAMESPACE_STORAGE)
 public class AzureStorageProperties extends BaseAzureProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureStorageProperties.class);
 
-	private static final VcapServiceType SERVICE_TYPE = VcapServiceType.AZURE_STORAGE;
-	private static final String TBD = "TBD";
-	private static final String STORAGE_ACCOUNT_NAME = "storage_account_name";
-	private static final String PRIMARY_ACCESS_KEY = "primary_access_key";
-	
-	private String name = TBD;
-	private String key = TBD;
-	
-	public AzureStorageProperties(Environment environment, VcapParser parser)
-	{
-		super(environment, parser);
-	}
+	private String name;
+	private String key;
 
-	@PostConstruct
-	private void populateProperties()
+	public String getName()
 	{
-		populateProperties(SERVICE_TYPE);
-	}
-
-	public void populatePropertiesForServiceInstance(String serviceInstanceName)
-	{
-		populatePropertiesForServiceInstance(SERVICE_TYPE, serviceInstanceName);
-	}
-
-	@Override
-	protected void populateProperties(VcapPojo pojo)
-	{
-		name = pojo.getCredentials().get(STORAGE_ACCOUNT_NAME);
-		key = pojo.getCredentials().get(PRIMARY_ACCESS_KEY);
-	}
-
-	public String getName() {
 		return name;
 	}
 
-	public void setName(String accountName) {
+	public void setName(String accountName)
+	{
 		this.name = accountName;
 	}
 
-	public String getKey() {
+	public String getKey()
+	{
 		return key;
 	}
 
-	public void setKey(String accountKey) {
+	public void setKey(String accountKey)
+	{
 		this.key = accountKey;
 	}
-	
+
+	public void populateStoragePropertiesForServiceInstance(String serviceInstanceName) throws ServiceInstanceNotFoundException
+	{
+		LOG.debug("populateStoragePropertiesForServiceInstance " + serviceInstanceName);
+		VcapServiceType serviceType = VcapServiceType.AZURE_STORAGE;
+		VcapPojo pojo = getResult().findPojoForServiceTypeAndServiceInstanceName(serviceType, serviceInstanceName);
+		if (pojo != null)
+		{
+			setName(pojo.getCredentials().get(Constants.STORAGE_ACCOUNT_NAME));
+			setKey(pojo.getCredentials().get(Constants.PRIMARY_ACCESS_KEY));
+			LOG.debug("populateStoragePropertiesForServiceInstance updated property values. " + getName() + ", " + getKey());
+		}
+		else
+		{
+			String msg = "populateStoragePropertiesForServiceInstance: No pojo found for serviceType " + serviceType + ", serviceInstanceName " + serviceInstanceName;
+			LOG.error(msg);
+			throw new ServiceInstanceNotFoundException(msg, serviceType, serviceInstanceName);
+		}
+	}
+
 	public String buildStorageConnectString()
 	{
-		String storageConnectionString = "DefaultEndpointsProtocol=http;"
-				+ "AccountName=" + getName() + ";"
-				+ "AccountKey=" + getKey();
+		String storageConnectionString = "DefaultEndpointsProtocol=http;" + "AccountName=" + getName() + ";" + "AccountKey=" + getKey();
 		LOG.debug("storageConnectionString = " + storageConnectionString);
-	    return storageConnectionString;
+		return storageConnectionString;
 	}
-	
+
 	@Override
 	public String toString()
 	{
-		return "AzureStorageProperties [accountName=" + name + ", accountKey=" + key + "]";
+		return "AzureStorageProperties [name=" + name + ", key=" + key + "]";
 	}
 }

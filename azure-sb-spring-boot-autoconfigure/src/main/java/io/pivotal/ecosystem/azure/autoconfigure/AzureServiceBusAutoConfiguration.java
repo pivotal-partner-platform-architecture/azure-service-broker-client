@@ -23,7 +23,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 import com.microsoft.windowsazure.services.servicebus.ServiceBusConfiguration;
 import com.microsoft.windowsazure.services.servicebus.ServiceBusContract;
@@ -35,7 +34,6 @@ import com.microsoft.windowsazure.services.servicebus.ServiceBusService;
 public class AzureServiceBusAutoConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureServiceBusAutoConfiguration.class);
-	private static final String TBD = "TBD";
 
 	private final AzureServiceBusProperties properties;
 
@@ -44,7 +42,6 @@ public class AzureServiceBusAutoConfiguration
 	}
 
 	@Bean
-	@Profile("!testing")
 	public ServiceBusContract serviceBusContract()
 	{
 		LOG.debug("serviceBusContract start...");
@@ -52,7 +49,6 @@ public class AzureServiceBusAutoConfiguration
 	}
 	
 	@Bean
-	@Profile("!testing")
 	public ServiceBusContractFactory serviceBusContractFactory()
 	{
 		return new ServiceBusContractFactory();
@@ -60,10 +56,10 @@ public class AzureServiceBusAutoConfiguration
 	
 	public class ServiceBusContractFactory
 	{
-		public ServiceBusContract createContractByServiceInstanceName(String serviceInstanceName)
+		public ServiceBusContract createContractByServiceInstanceName(String serviceInstanceName) throws ServiceInstanceNotFoundException
 		{
 			LOG.debug("creating ServiceBusContract for serviceInstanceName = " + serviceInstanceName);
-			properties.populatePropertiesForServiceInstance(serviceInstanceName);
+			properties.populateServiceBusPropertiesForServiceInstance(serviceInstanceName);
 			return createServiceBusContract();
 		}
 	}
@@ -73,7 +69,7 @@ public class AzureServiceBusAutoConfiguration
 		LOG.debug("createServiceBusContract start...");
 		ServiceBusContract service = null;
 		
-		if (! TBD.equals(properties.getNamespaceName()))
+		if (properties.getNamespaceName() != null)
 		{
 			com.microsoft.windowsazure.Configuration config = new com.microsoft.windowsazure.Configuration();
 			String connectionString = properties.buildServiceBusConnectString();

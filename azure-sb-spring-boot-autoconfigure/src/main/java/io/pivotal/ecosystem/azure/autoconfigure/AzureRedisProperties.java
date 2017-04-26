@@ -17,47 +17,19 @@
 
 package io.pivotal.ecosystem.azure.autoconfigure;
 
-import javax.annotation.PostConstruct;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.env.Environment;
 
-@ConfigurationProperties("azure.redis")
+@ConfigurationProperties(Constants.NAMESPACE_REDIS)
 public class AzureRedisProperties extends BaseAzureProperties
 {
-	private static final VcapServiceType SERVICE_TYPE = VcapServiceType.AZURE_REDISCACHE;
-	private static final String HOST_NAME = "hostname";
-	private static final String SSL_PORT = "sslPort";
-	private static final String PRIMARY_KEY = "primaryKey";
+	private static final Logger LOG = LoggerFactory.getLogger(AzureRedisProperties.class);
 
-	private String hostname = "TBD";
-	private String sslPort = "TBD";
-	private String primaryKey = "TBD";
+	private String hostname;
+	private String sslPort;
+	private String primaryKey;
 	
-	public AzureRedisProperties(Environment environment, VcapParser parser)
-	{
-		super(environment, parser);
-	}
-	
-	@PostConstruct
-	private void populateProperties()
-	{
-		populateProperties(SERVICE_TYPE);
-	}
-
-	public void populatePropertiesForServiceInstance(String serviceInstanceName)
-	{
-		populatePropertiesForServiceInstance(SERVICE_TYPE, serviceInstanceName);
-	}
-	
-	@Override
-	protected void populateProperties(VcapPojo pojo)
-	{
-		hostname = pojo.getCredentials().get(HOST_NAME);
-		sslPort = pojo.getCredentials().get(SSL_PORT);
-		primaryKey = pojo.getCredentials().get(PRIMARY_KEY);
-	}
-
 	public String getHostname()
 	{
 		return hostname;
@@ -86,6 +58,26 @@ public class AzureRedisProperties extends BaseAzureProperties
 	public void setPrimaryKey(String primaryKey)
 	{
 		this.primaryKey = primaryKey;
+	}
+
+	public void populateRedisPropertiesForServiceInstance(String serviceInstanceName) throws ServiceInstanceNotFoundException
+	{
+		LOG.debug("populateRedisPropertiesForServiceInstance " + serviceInstanceName);
+		VcapServiceType serviceType = VcapServiceType.AZURE_REDISCACHE;
+		VcapPojo pojo = getResult().findPojoForServiceTypeAndServiceInstanceName(serviceType, serviceInstanceName);
+		if (pojo != null)
+		{
+			setHostname(pojo.getCredentials().get(Constants.HOST_NAME));
+			setPrimaryKey(pojo.getCredentials().get(Constants.PRIMARY_KEY));
+			setSslPort(pojo.getCredentials().get(Constants.SSL_PORT));
+			LOG.debug("populateRedisPropertiesForServiceInstance updated property values. " + getHostname() + ", " + getPrimaryKey() + ", " + getSslPort());
+		}
+		else
+		{
+			String msg = "populateRedisPropertiesForServiceInstance: No pojo found for serviceType " + serviceType + ", serviceInstanceName " + serviceInstanceName;
+			LOG.error(msg);
+			throw new ServiceInstanceNotFoundException(msg, serviceType, serviceInstanceName);
+		}
 	}
 
 	@Override

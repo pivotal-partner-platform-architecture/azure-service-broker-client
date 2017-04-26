@@ -17,17 +17,15 @@
 
 package io.pivotal.ecosystem.azure.autoconfigure;
 
-abstract public class BaseAzureProperties
+import org.springframework.core.NestedRuntimeException;
+
+public class AzureServiceException extends NestedRuntimeException
 {
-	private VcapResult result;
-
-	public VcapResult getResult()
+	private static final long serialVersionUID = 1L;
+	
+	public AzureServiceException(String msg, Throwable t)
 	{
-		return result;
+		super(msg, t);
 	}
 
-	public void setResult(VcapResult result)
-	{
-		this.result = result;
-	}
 }

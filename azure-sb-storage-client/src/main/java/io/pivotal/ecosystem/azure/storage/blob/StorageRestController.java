@@ -62,12 +62,6 @@ public class StorageRestController
 			if (account == null)
 			{
 				account = factory.createAccountByServiceInstanceName("mystorage");
-				if (account == null)
-				{
-					String message = "CloudStorageAccount object not injected, lookup by name failed.";
-					LOG.error(message);
-					throw new RuntimeException(message);
-				}
 			}
 
 			URL u = new URL(IMAGE_PATH);

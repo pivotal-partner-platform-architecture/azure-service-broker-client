@@ -17,12 +17,9 @@
 
 package io.pivotal.ecosystem.azure.autoconfigure;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.env.Environment;
 
 /**
  * 
@@ -32,53 +29,17 @@ import org.springframework.core.env.Environment;
  *         Instance and the DocumentDB Resource ID is defined in the
  *         azure-sb-documentdb-client project's application.properties
  */
-@ConfigurationProperties("azure.documentdb")
+@ConfigurationProperties(Constants.NAMESPACE_DOCUMENTDB)
 public class AzureDocumentDBProperties extends BaseAzureProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AzureDocumentDBProperties.class);
-
-	private static final VcapServiceType SERVICE_TYPE = VcapServiceType.AZURE_DOCUMENTDB;
-	private static final String HOST_ENDPOINT = "documentdb_host_endpoint";
-	private static final String MASTER_KEY = "documentdb_master_key";
-	private static final String DATABASE_ID = "documentdb_database_id";
-	private static final String DATABASE_LINK = "documentdb_database_link";
+	
+	private String hostEndpoint;
+	private String masterKey;
 
 	private String resourceId = "myresource";
-
-	/**
-	 * Adding default values for the below attributes just so the Tests pass
-	 * when running Maven builds
-	 */
-	private String hostEndpoint = "TBD";
-	private String masterKey = "TBD";
-	private String databaseId = "TBD";
-	private String link = "TBD";
-
-	public AzureDocumentDBProperties(Environment environment, VcapParser parser)
-	{
-		super(environment, parser);
-	}
-
-	@PostConstruct
-	private void populateProperties()
-	{
-		populateProperties(SERVICE_TYPE);
-		LOG.debug("INSIDE populateProperties");
-	}
-
-	public void populatePropertiesForServiceInstance(String serviceInstanceName)
-	{
-		populatePropertiesForServiceInstance(SERVICE_TYPE, serviceInstanceName);
-	}
-
-	@Override
-	protected void populateProperties(VcapPojo pojo)
-	{
-		hostEndpoint = pojo.getCredentials().get(HOST_ENDPOINT);
-		masterKey = pojo.getCredentials().get(MASTER_KEY);
-		databaseId = pojo.getCredentials().get(DATABASE_ID);
-		link = pojo.getCredentials().get(DATABASE_LINK);
-	}
+	private String databaseId = "mydatabaseId";
+	private String link;
 
 	public String getResourceId()
 	{
@@ -130,12 +91,29 @@ public class AzureDocumentDBProperties extends BaseAzureProperties
 		this.link = link;
 	}
 
+	public void populateDocumentDBPropertiesForServiceInstance(String serviceInstanceName) throws ServiceInstanceNotFoundException
+	{
+		LOG.debug("populateDocumentDBPropertiesForServiceInstance " + serviceInstanceName);
+		VcapServiceType serviceType = VcapServiceType.AZURE_DOCUMENTDB;
+		VcapPojo pojo = getResult().findPojoForServiceTypeAndServiceInstanceName(serviceType, serviceInstanceName);
+		if (pojo != null)
+		{
+			setHostEndpoint(pojo.getCredentials().get(Constants.HOST_ENDPOINT));
+			setMasterKey(pojo.getCredentials().get(Constants.MASTER_KEY));
+			LOG.debug("populateDocumentDBPropertiesForServiceInstance updated property values. " + getDatabaseId() + ", " + getHostEndpoint() + ", " + getMasterKey());
+		}
+		else
+		{
+			String msg = "populateDocumentDBPropertiesForServiceInstance: No pojo found for serviceType " + serviceType + ", serviceInstanceName " + serviceInstanceName;
+			LOG.error(msg);
+			throw new ServiceInstanceNotFoundException(msg, serviceType, serviceInstanceName);
+		}
+	}
+
 	@Override
 	public String toString()
 	{
 		return "AzureDocumentDBProperties [resourceId=" + resourceId
 				+ ", hostEndpoint=" + hostEndpoint + ", masterKey=" + masterKey + ", databaseId=" + databaseId + ", link=" + link + "]";
 	}
-
-	
 }

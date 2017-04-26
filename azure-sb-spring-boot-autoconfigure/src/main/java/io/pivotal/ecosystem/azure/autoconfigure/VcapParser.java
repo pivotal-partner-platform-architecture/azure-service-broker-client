@@ -24,19 +24,26 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.stereotype.Service;
 
 @Service
 @Configuration
-public class VcapParser
+/**
+ * Parses VCAP_SERVICES environment variable and sets corresponding property values.
+ * 
+ * Note that this class gets invoked before Spring creates the logging subsystem, so 
+ * we just use System.out.println instead.  
+ */
+public class VcapParser implements EnvironmentPostProcessor
 {
 	public static final String VCAP_SERVICES = "VCAP_SERVICES";
 
-	private static final Logger LOG = LoggerFactory.getLogger(VcapParser.class);
-
+	private static final boolean LOGFLAG = true;
+	
 	private static final String AZURE = "azure-";
 	private static final String CREDENTIALS = "credentials";
 	private static final String LABEL = "label";
@@ -47,30 +54,40 @@ public class VcapParser
 	private static final String TAGS = "tags";
 	private static final String VOLUME_MOUNTS = "volume_mounts";
 
-	public VcapResult parse(String vcapServices)
+	private VcapResult result;
+
+	@Override
+	public void postProcessEnvironment(ConfigurableEnvironment confEnv, SpringApplication app)
+	{
+		log("VcapParser.postProcessEnvironment: Start");
+		Map<String, Object> environment = confEnv.getSystemEnvironment();
+		String vcapServices = (String) environment.get(VcapParser.VCAP_SERVICES);
+		result = parse(vcapServices);
+		result.setConfEnv(confEnv);
+		result.populateProperties();
+		log("VcapParser.postProcessEnvironment: End");
+	}
+
+	VcapResult parse(String vcapServices)
 	{
 		VcapResult result = new VcapResult();
 
 		List<VcapPojo> results = new ArrayList<VcapPojo>();
 
-		LOG.debug("vcapServices = " + vcapServices);
+		log("VcapParser.parse:  vcapServices = " + vcapServices);
 		if (vcapServices != null)
 		{
 			try
 			{
 				JSONObject json = new JSONObject(vcapServices);
 				JSONArray names = json.names();
-				LOG.debug("names = " + names);
 				for (int i = 0; i < names.length(); i++)
 				{
 					String name = (String) names.get(i);
-					LOG.debug("name = " + name);
 					if (name.startsWith(AZURE))
 					{
 						JSONArray azureService = json.getJSONArray(name);
-
 						int numElements = azureService.length();
-						LOG.debug("numElements = " + numElements);
 						for (int index = 0; index < numElements; index++)
 						{
 							VcapPojo pojo = parseService(name, azureService, vcapServices, index);
@@ -80,7 +97,8 @@ public class VcapParser
 				}
 			} catch (JSONException e)
 			{
-				LOG.error("Error parsing " + vcapServices, e);
+				System.err.println("Error parsing " + vcapServices);
+				e.printStackTrace(System.err);
 			}
 		}
 
@@ -90,8 +108,6 @@ public class VcapParser
 
 	private VcapPojo parseService(String serviceBrokerName, JSONArray azureService, String vCapServices, int index)
 	{
-		LOG.debug("Parsing serviceBrokerName " + serviceBrokerName);
-
 		VcapPojo result = new VcapPojo();
 		result.setServiceBrokerName(serviceBrokerName);
 
@@ -113,7 +129,8 @@ public class VcapParser
 			}
 		} catch (JSONException e)
 		{
-			LOG.error("Found " + serviceBrokerName + ", but missing " + CREDENTIALS + " : " + vCapServices, e);
+			System.err.println("Found " + serviceBrokerName + ", but missing " + CREDENTIALS + " : " + vCapServices);
+			e.printStackTrace(System.err);
 		}
 		return result;
 	}
@@ -129,7 +146,8 @@ public class VcapParser
 				results.add((String) strings.get(i));
 			} catch (JSONException e)
 			{
-				LOG.error("Error parsing " + strings, e);
+				System.err.println("Error parsing " + strings);
+				e.printStackTrace(System.err);
 			}
 		}
 
@@ -148,7 +166,8 @@ public class VcapParser
 				target.put(key, value);
 			} catch (JSONException e)
 			{
-				LOG.error("Error parsing " + mapObject, e);
+				System.err.println("Error parsing " + mapObject);
+				e.printStackTrace(System.err);
 			}
 		}
 	}
@@ -165,9 +184,18 @@ public class VcapParser
 			}
 		} catch (JSONException e)
 		{
-			LOG.error("Error parsing " + service, e);
+			System.err.println("Error parsing " + service);
+			e.printStackTrace(System.err);
 		}
 
 		return result;
+	}
+
+	private void log(String msg)
+	{
+		if (LOGFLAG)
+		{
+			System.out.println(msg);
+		}
 	}
 }
