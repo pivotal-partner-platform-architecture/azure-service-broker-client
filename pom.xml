@@ -5,7 +5,7 @@
 	
 	<groupId>io.pivotal.azuresb</groupId>
 	<artifactId>azure-sb-demo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Azure Service Broker Demo</name>
 
